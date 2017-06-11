@@ -17,6 +17,7 @@ using namespace gump;
 StreamManager::StreamManager(QObject *parent)
   : QObject(parent)
 {
+  UpdateStreamRule();
   network_mgr_ = new QNetworkAccessManager(this);
   connect(network_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishRequest(QNetworkReply*)));
   QTimer::singleShot(1000, this, SLOT(RefreshChannelStreamsTimer()));
@@ -143,18 +144,15 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
   if (doc.isObject()) {
     QJsonObject obj = doc.object();
     for (QJsonObject::Iterator iter = obj.begin(); iter != obj.end(); ++iter) {
-      QStringList channel_key = iter.key().split(":");
-      if (channel_key.size() != 2) {
-        std::cout << "cannot split key: " << iter.key().toStdString() << std::endl;
-        continue;
-      }
+      QString vid = iter.key().section(":", 0, 0);
+      QString cname = iter.key().section(":", 1);
 
       if (iter.value().type() != QJsonValue::Array) {
         std::cout << "cannot get steams type: " << iter.value().type() << std::endl;
         continue;
       }
 
-      Streams &streams = channel_streams[std::make_pair(channel_key[0].toStdString(), channel_key[1].toStdString())];
+      Streams &streams = channel_streams[std::make_pair(vid.toStdString(), cname.toStdString())];
 
       QJsonArray raw_streams = iter.value().toArray();
       foreach (QJsonValue stream, raw_streams) {

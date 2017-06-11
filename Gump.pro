@@ -25,7 +25,8 @@ SOURCES += \
     src/view/main_menubar.cpp \
     src/view/preferences_dialog.cpp \
     src/view/main_central_widget.cpp \
-    src/controller/stream_manager.cpp
+    src/controller/stream_manager.cpp \
+    src/view/main_toolbar.cpp
 HEADERS  += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -33,7 +34,8 @@ HEADERS  += \
     src/view/preferences_dialog.h \
     src/view/main_central_widget.h \
     src/controller/stream_manager.h \
-    src/commons/definations.h
+    src/commons/definations.h \
+    src/view/main_toolbar.h
 RESOURCES += \
     resource.qrc
 ICON = icon.icns

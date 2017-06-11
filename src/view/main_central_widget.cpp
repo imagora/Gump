@@ -1,7 +1,9 @@
 #include "main_central_widget.h"
 #include "controller/stream_manager.h"
+#include <QTableWidgetItem>
 #include <QTableWidget>
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QSettings>
 #include <QRegExp>
 #include <iostream>
@@ -22,6 +24,8 @@ MainCentralWidget::MainCentralWidget(QWidget *parent)
   stream_table_ = new QTableWidget(this);
   stream_table_->setColumnCount(3);
   stream_table_->setHorizontalHeaderLabels(QStringList{"VID", "CNAME", "STREAM"});
+  stream_table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  stream_table_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
   layout_->addWidget(stream_table_);
   connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(OnPlay(QTableWidgetItem*)));
@@ -35,6 +39,89 @@ MainCentralWidget::~MainCentralWidget()
 void MainCentralWidget::UpdateStreamRule()
 {
   stream_mgr_->UpdateStreamRule();
+}
+
+void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cname, const std::string &stream)
+{
+  int selected_row = 0;
+  if (!vid.empty()) {
+    QList<QTableWidgetItem *> find_items = stream_table_->findItems(vid.c_str(), Qt::MatchExactly);
+    if (find_items.empty()) return;
+
+    int row = (*find_items.begin())->row();
+    if (cname.empty() && stream.empty()) {
+      stream_table_->selectRow(row);
+      return;
+    }
+
+    foreach (QTableWidgetItem *item, find_items) {
+      row = item->row();
+      if (!cname.empty() &&
+          !stream_table_->item(row, 1)->text().contains(cname.c_str(), Qt::CaseInsensitive)) {
+        continue;
+      }
+
+      if (stream.empty()) {
+        stream_table_->selectRow(row);
+        return;
+      }
+
+      if (selected_row == 0) {
+        selected_row = row;
+      }
+
+      if (!stream_table_->item(row, 2)->text().contains(stream.c_str(), Qt::CaseInsensitive)) {
+        continue;
+      }
+
+      stream_table_->selectRow(row);
+      return;
+    }
+
+    stream_table_->selectRow(selected_row == 0 ? row : selected_row);
+    return;
+  }
+
+  if (!cname.empty()) {
+    QList<QTableWidgetItem *> find_items = stream_table_->findItems(cname.c_str(), Qt::MatchContains);
+    if (find_items.empty()) return;
+
+    int row = (*find_items.begin())->row();
+    if (stream.empty()) {
+      stream_table_->selectRow(row);
+      return;
+    }
+
+    foreach (QTableWidgetItem *item, find_items) {
+      row = item->row();
+      if (stream.empty()) {
+        stream_table_->selectRow(row);
+        return;
+      }
+
+      if (selected_row == 0) {
+        selected_row = row;
+      }
+
+      if (!stream_table_->item(row, 2)->text().contains(stream.c_str(), Qt::CaseInsensitive)) {
+        continue;
+      }
+
+      stream_table_->selectRow(row);
+      return;
+    }
+
+    stream_table_->selectRow(selected_row == 0 ? row : selected_row);
+    return;
+  }
+
+  if (!stream.empty()) {
+    QList<QTableWidgetItem *> find_items = stream_table_->findItems(cname.c_str(), Qt::MatchContains);
+    if (find_items.empty()) return;
+
+    int row = (*find_items.begin())->row();
+    stream_table_->selectRow(row);
+  }
 }
 
 void MainCentralWidget::InsertRow(const std::string &vid, const std::string &cname, const std::string &stream)

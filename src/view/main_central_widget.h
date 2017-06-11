@@ -26,6 +26,8 @@ class MainCentralWidget : public QWidget
 
   void UpdateStreamRule();
 
+  void SearchItem(const std::string &vid, const std::string &cname, const std::string &stream);
+
  private:
   void InsertRow(const std::string &vid, const std::string &cname, const std::string &stream);
 
