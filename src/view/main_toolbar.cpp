@@ -1,5 +1,6 @@
 #include "main_toolbar.h"
-#include <iostream>
+#include "commons/definations.h"
+#include <log4cplus/log4cplus.h>
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QToolButton>
@@ -57,11 +58,12 @@ void MainToolBar::OnSearch()
     } else if (str.startsWith("stream:", Qt::CaseInsensitive)) {
       stream = str.section(":", 1).toStdString();
     } else {
-      std::cout << "cannot parse search string: " << str.toStdString() << std::endl;
+      LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot parse search string: %s",
+                         str.toStdString().c_str());
     }
   }
 
-  std::cout << "Search vid:" << vid << " cname:"
-            << cname << " stream:" << stream << std::endl;
+  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Search vid: [%s] cname: [%s] stream: [%s]",
+                     vid.c_str(), cname.c_str(), stream.c_str());
   emit SearchItem(vid, cname, stream);
 }

@@ -1,12 +1,12 @@
 #include "main_central_widget.h"
 #include "controller/stream_manager.h"
+#include <log4cplus/log4cplus.h>
 #include <QTableWidgetItem>
 #include <QTableWidget>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QSettings>
 #include <QRegExp>
-#include <iostream>
 #include <map>
 
 
@@ -214,7 +214,8 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
   }
 
   cmd += stream;
-  std::cout << cmd << std::endl;
+
+  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Run cmd: %s", cmd.c_str());
   stream_mgr_->PlayStream(cmd);
 }
 

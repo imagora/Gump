@@ -1,5 +1,5 @@
 #include "stream_manager.h"
-#include <iostream>
+#include <log4cplus/log4cplus.h>
 #include <QTimer>
 #include <QSettings>
 #include <QJsonValue>
@@ -33,7 +33,7 @@ void StreamManager::PlayStream(const std::string &command)
 {
   FILE* fp = popen(command.c_str(), "r");
   if (fp == NULL) {
-    std::cout << "failed to run command '" << command << "'" << std::endl;
+    LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Failed to run cmd: %s", command.c_str());
   }
 }
 
@@ -83,7 +83,7 @@ void StreamManager::UpdateStreamRule()
   QJsonParseError parse_err;
   QJsonDocument rule_json = QJsonDocument::fromJson(rule.c_str(), &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    std::cout << "parse rule(json) error: " << rule << std::endl;
+    LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Parse rule(json) error: %s", rule.c_str());
     return;
   }
 
@@ -94,7 +94,7 @@ void StreamManager::UpdateStreamRule()
       RuleKey key = iter.key().toStdString();
 
       if (!iter.value().isObject()) {
-        std::cout << "cannot get rule for key: " << key << std::endl;
+        LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Cannot get rule for key: %s", key.c_str());
         continue;
       }
 
@@ -102,7 +102,7 @@ void StreamManager::UpdateStreamRule()
       QJsonValue re_val = rule_obj["re"];
       QJsonValue url_val = rule_obj["url"];
       if (re_val == QJsonValue::Undefined || url_val == QJsonValue::Undefined) {
-        std::cout << "cannot get re and url from value: " << key << std::endl;
+        LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Cannot get re and url from value: %s", key.c_str());
         continue;
       }
 
@@ -136,7 +136,7 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
   QJsonParseError parse_err;
   QJsonDocument doc = QJsonDocument::fromJson(data, &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    std::cout << "parse json error" << std::endl;
+    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Parse stream info error");
     return;
   }
 
@@ -148,7 +148,7 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
       QString cname = iter.key().section(":", 1);
 
       if (iter.value().type() != QJsonValue::Array) {
-        std::cout << "cannot get steams type: " << iter.value().type() << std::endl;
+        LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot get steams type: %d", iter.value().type());
         continue;
       }
 

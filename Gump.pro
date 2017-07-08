@@ -9,8 +9,10 @@ QT += core gui network
 #---------------------------------------------------------------------
 # PART 2: target, library, flags
 TARGET = bin/Gump
-DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += src
+INCLUDEPATH += /usr/local/include
+LIBS += -L/usr/lib -L/usr/local/lib -llog4cplus
+DEFINES += QT_DEPRECATED_WARNINGS
 
 #---------------------------------------------------------------------
 # PART 3: Clean
@@ -26,7 +28,10 @@ SOURCES += \
     src/view/preferences_dialog.cpp \
     src/view/main_central_widget.cpp \
     src/controller/stream_manager.cpp \
-    src/view/main_toolbar.cpp
+    src/view/main_toolbar.cpp \
+    src/view/log_dock.cpp \
+    src/controller/log_dock_appender.cpp \
+    src/controller/request_streams.cpp
 HEADERS  += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -35,7 +40,10 @@ HEADERS  += \
     src/view/main_central_widget.h \
     src/controller/stream_manager.h \
     src/commons/definations.h \
-    src/view/main_toolbar.h
+    src/view/main_toolbar.h \
+    src/view/log_dock.h \
+    src/controller/log_dock_appender.h \
+    src/controller/request_streams.h
 RESOURCES += \
     resource.qrc
 ICON = icon.icns
