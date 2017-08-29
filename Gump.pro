@@ -30,8 +30,7 @@ SOURCES += \
     src/controller/stream_manager.cpp \
     src/view/main_toolbar.cpp \
     src/view/log_dock.cpp \
-    src/controller/log_dock_appender.cpp \
-    src/controller/request_streams.cpp
+    src/controller/log_dock_appender.cpp
 HEADERS  += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -42,8 +41,7 @@ HEADERS  += \
     src/commons/definations.h \
     src/view/main_toolbar.h \
     src/view/log_dock.h \
-    src/controller/log_dock_appender.h \
-    src/controller/request_streams.h
+    src/controller/log_dock_appender.h
 RESOURCES += \
     resource.qrc
 ICON = icon.icns
