@@ -127,7 +127,7 @@ void StreamManager::RefreshChannelStreams()
 void StreamManager::RefreshChannelStreamsTimer()
 {
   RefreshChannelStreams();
-  QTimer::singleShot(60 * 1000, this, SLOT(RefreshChannelStreamsTimer()));
+  QTimer::singleShot(5 * 60 * 1000, this, SLOT(RefreshChannelStreamsTimer()));
 }
 
 void StreamManager::FinishRequest(QNetworkReply *reply)
@@ -164,7 +164,8 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
       QJsonObject stream = stream_value.toObject();
       uint32_t vid = stream.find("vid").value().toInt();
       QString cname = stream.find("cname").value().toString();
-      channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].push_back(stream.find("url").value().toString().toStdString());
+      channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].
+          push_back(stream.find("url").value().toString().toStdString());
     }
   }
 
