@@ -166,23 +166,6 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
       QString cname = stream.find("cname").value().toString();
       channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].push_back(stream.find("url").value().toString().toStdString());
     }
-
-//    for (QJsonObject::Iterator iter = obj.begin(); iter != obj.end(); ++iter) {
-//      QString vid = iter.key().section(":", 0, 0);
-//      QString cname = iter.key().section(":", 1);
-
-//      if (iter.value().type() != QJsonValue::Array) {
-//        LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot get steams type: %d", iter.value().type());
-//        continue;
-//      }
-
-//      Streams &streams = ;
-
-//      QJsonArray raw_streams = iter.value().toArray();
-//      foreach (QJsonValue stream, raw_streams) {
-//        streams.push_back(stream.toString().toStdString());
-//      }
-//    }
   }
 
   emit Refresh(channel_streams);
