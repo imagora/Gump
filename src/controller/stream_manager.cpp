@@ -143,22 +143,46 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
   ChannelStreams channel_streams;
   if (doc.isObject()) {
     QJsonObject obj = doc.object();
-    for (QJsonObject::Iterator iter = obj.begin(); iter != obj.end(); ++iter) {
-      QString vid = iter.key().section(":", 0, 0);
-      QString cname = iter.key().section(":", 1);
-
-      if (iter.value().type() != QJsonValue::Array) {
-        LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot get steams type: %d", iter.value().type());
-        continue;
-      }
-
-      Streams &streams = channel_streams[std::make_pair(vid.toStdString(), cname.toStdString())];
-
-      QJsonArray raw_streams = iter.value().toArray();
-      foreach (QJsonValue stream, raw_streams) {
-        streams.push_back(stream.toString().toStdString());
-      }
+    auto success_iter = obj.find("success");
+    if (success_iter.value().type() != QJsonValue::Bool ||
+        !success_iter.value().toBool()) {
+      LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Request streams failed, success error");
+      return;
     }
+
+    auto data_iter = obj.find("data");
+    if (data_iter.value().type() != QJsonValue::Object) {
+      LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Request streams failed, no data");
+      return;
+    }
+    QJsonObject data = data_iter.value().toObject();
+    int total_count = data.find("total_count").value().toInt();
+    LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Total stream count: %d", total_count);
+
+    QJsonArray streams = data.find("streams").value().toArray();
+    foreach (QJsonValue stream_value, streams) {
+      QJsonObject stream = stream_value.toObject();
+      uint32_t vid = stream.find("vid").value().toInt();
+      QString cname = stream.find("cname").value().toString();
+      channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].push_back(stream.find("url").value().toString().toStdString());
+    }
+
+//    for (QJsonObject::Iterator iter = obj.begin(); iter != obj.end(); ++iter) {
+//      QString vid = iter.key().section(":", 0, 0);
+//      QString cname = iter.key().section(":", 1);
+
+//      if (iter.value().type() != QJsonValue::Array) {
+//        LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot get steams type: %d", iter.value().type());
+//        continue;
+//      }
+
+//      Streams &streams = ;
+
+//      QJsonArray raw_streams = iter.value().toArray();
+//      foreach (QJsonValue stream, raw_streams) {
+//        streams.push_back(stream.toString().toStdString());
+//      }
+//    }
   }
 
   emit Refresh(channel_streams);
