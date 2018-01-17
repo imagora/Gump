@@ -20,7 +20,6 @@ LogDockAppender::~LogDockAppender()
 
 void LogDockAppender::close()
 {
-  LOG4CPLUS_DEBUG_STR(LOGGER_NAME, "Entering LogDockAppender::close()..");
   closed = true;
 }
 
