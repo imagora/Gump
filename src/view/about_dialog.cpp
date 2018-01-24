@@ -26,7 +26,7 @@ AboutDialog::AboutDialog(QWidget *parent/* = nullptr*/)
                                      tr("you never know what you’re gonna get."),
                                      this);
 
-    QLabel *version_label = new QLabel("Version: 0.3 by shanhui&chengdongxu\n"
+    QLabel *version_label = new QLabel("Version: 1.0 by shanhui&chengdongxu\n"
                                        "Copyright 2017 agora.io", this);
 
     layout->addWidget(about_label, 0, 1, 1, 1);
