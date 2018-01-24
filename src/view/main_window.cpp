@@ -51,4 +51,9 @@ void MainWindow::SearchItem(std::string vid, std::string cname, std::string stre
   central_widget_->SearchItem(vid, cname, stream);
 }
 
+void MainWindow::closeEvent(QCloseEvent *)
+{
+  log4cplus::Logger::getInstance(LOGGER_NAME).removeAllAppenders();
+}
+
 

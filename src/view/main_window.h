@@ -25,6 +25,9 @@ class MainWindow : public QMainWindow
 
   void SearchItem(std::string vid, std::string cname, std::string stream);
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
  private:
   LogDock *log_dock_;
   LogDockAppender *log_appender_;
