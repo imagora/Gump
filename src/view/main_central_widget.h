@@ -5,13 +5,13 @@
 
 
 class QTableWidget;
-class QHBoxLayout;
 class QTableWidgetItem;
 
 
 namespace gump {
 
 
+class PlayerWidget;
 class StreamManager;
 
 
@@ -40,7 +40,7 @@ class MainCentralWidget : public QWidget
   void RefreshStreams(ChannelStreams channel_streams);
 
  private:
-  QHBoxLayout *layout_;
+  PlayerWidget *player_widget_;
   QTableWidget *stream_table_;
   StreamManager *stream_mgr_;
   ChannelStreams channel_streams_;

@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TEMPLATE = app
 OBJECTS_DIR = .objs
-QT += core gui network
+QT += core gui network avwidgets
 
 #---------------------------------------------------------------------
 # PART 2: target, library, flags
@@ -30,7 +30,8 @@ SOURCES += \
     src/controller/stream_manager.cpp \
     src/view/main_toolbar.cpp \
     src/view/log_dock.cpp \
-    src/controller/log_dock_appender.cpp
+    src/controller/log_dock_appender.cpp \
+    src/view/player_widget.cpp
 HEADERS  += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -41,7 +42,8 @@ HEADERS  += \
     src/commons/definations.h \
     src/view/main_toolbar.h \
     src/view/log_dock.h \
-    src/controller/log_dock_appender.h
+    src/controller/log_dock_appender.h \
+    src/view/player_widget.h
 RESOURCES += \
     resource.qrc
 ICON = icon.icns

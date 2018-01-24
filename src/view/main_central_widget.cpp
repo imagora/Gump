@@ -1,8 +1,10 @@
 #include "main_central_widget.h"
+#include "player_widget.h"
 #include "controller/stream_manager.h"
 #include <log4cplus/log4cplus.h>
 #include <QTableWidgetItem>
 #include <QTableWidget>
+#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QSettings>
@@ -18,16 +20,22 @@ MainCentralWidget::MainCentralWidget(QWidget *parent)
 {
   stream_mgr_ = new StreamManager(this);
 
-  layout_ = new QHBoxLayout(this);
-  setLayout(layout_);
+  QHBoxLayout *all_layout = new QHBoxLayout();
+  setLayout(all_layout);
+
+  QVBoxLayout *table_layout = new QVBoxLayout();
+  all_layout->addLayout(table_layout);
 
   stream_table_ = new QTableWidget(this);
   stream_table_->setColumnCount(3);
   stream_table_->setHorizontalHeaderLabels(QStringList{"VID", "CNAME", "STREAM"});
   stream_table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   stream_table_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+  table_layout->addWidget(stream_table_);
 
-  layout_->addWidget(stream_table_);
+  player_widget_ = new PlayerWidget(this);
+  all_layout->addWidget(player_widget_);
+
   connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(OnPlay(QTableWidgetItem*)));
   connect(stream_mgr_, SIGNAL(Refresh(ChannelStreams)), this, SLOT(RefreshStreams(ChannelStreams)));
 }
@@ -203,6 +211,7 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
     return;
   }
   stream = stream_mgr_->ConvertToPlayUrl(stream);
+  player_widget_->PlayStream(stream);
 
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
@@ -216,7 +225,7 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
   cmd += stream;
 
   LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Run cmd: %s", cmd.c_str());
-  stream_mgr_->PlayStream(cmd);
+//  stream_mgr_->PlayStream(cmd);
 }
 
 void MainCentralWidget::RefreshStreams(ChannelStreams channel_streams)
