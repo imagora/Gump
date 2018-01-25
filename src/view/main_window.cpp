@@ -3,7 +3,6 @@
 #include "main_menubar.h"
 #include "main_toolbar.h"
 #include "main_central_widget.h"
-#include "controller/log_dock_appender.h"
 #include <log4cplus/log4cplus.h>
 #include <QIcon>
 
@@ -27,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
   addToolBar(toolbar_);
   setCentralWidget(central_widget_);
 
-  log4cplus::SharedAppenderPtr log_appender(new LogDockAppender(log_dock_));
-  log4cplus::Logger::getInstance(LOGGER_NAME).addAppender(log_appender);
+  log_appender_ = log4cplus::SharedAppenderPtr(new LogDockAppender(log_dock_));
+  log4cplus::Logger::getInstance(LOGGER_NAME).addAppender(log_appender_);
 
   setWindowState(Qt::WindowMaximized);
   connect(toolbar_, SIGNAL(SearchItem(std::string,std::string,std::string)),
@@ -53,6 +52,7 @@ void MainWindow::SearchItem(std::string vid, std::string cname, std::string stre
 
 void MainWindow::closeEvent(QCloseEvent *)
 {
+  log_appender_->destructorImpl();
   log4cplus::Logger::getInstance(LOGGER_NAME).removeAllAppenders();
 }
 

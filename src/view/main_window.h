@@ -1,5 +1,6 @@
 #pragma once
 #include <QMainWindow>
+#include "controller/log_dock_appender.h"
 
 
 namespace gump {
@@ -30,7 +31,7 @@ protected:
 
  private:
   LogDock *log_dock_;
-  LogDockAppender *log_appender_;
+  log4cplus::SharedAppenderPtr log_appender_;
   MainMenuBar *menu_;
   MainToolBar *toolbar_;
   MainCentralWidget *central_widget_;
