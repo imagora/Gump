@@ -211,6 +211,7 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
     return;
   }
   stream = stream_mgr_->ConvertToPlayUrl(stream);
+  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Play stream: %s", stream.c_str());
   player_widget_->PlayStream(stream);
 
   QSettings settings("agora.io", "gump");
@@ -225,7 +226,7 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
   cmd += stream;
 
   LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Run cmd: %s", cmd.c_str());
-//  stream_mgr_->PlayStream(cmd);
+  stream_mgr_->PlayStream(cmd);
 }
 
 void MainCentralWidget::RefreshStreams(ChannelStreams channel_streams)
