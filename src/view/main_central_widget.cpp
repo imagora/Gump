@@ -211,7 +211,13 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
     return;
   }
   stream = stream_mgr_->ConvertToPlayUrl(stream);
+  if (stream.empty()) {
+    LOG4CPLUS_WARN_STR(LOGGER_NAME, "Cannot convert stream to play url");
+    return;
+  }
+
   LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Play stream: %s", stream.c_str());
+  player_widget_->StopStream();
   player_widget_->PlayStream(stream);
 
   QSettings settings("agora.io", "gump");

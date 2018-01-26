@@ -45,7 +45,8 @@ void MainWindow::UpdatePreferences()
   central_widget_->UpdateStreamRule();
 }
 
-void MainWindow::SearchItem(std::string vid, std::string cname, std::string stream)
+void MainWindow::SearchItem(std::string vid, std::string cname,
+                            std::string stream)
 {
   central_widget_->SearchItem(vid, cname, stream);
 }
