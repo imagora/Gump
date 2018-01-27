@@ -20,8 +20,20 @@ class MainToolBar : public QToolBar
  signals:
   void SearchItem(std::string vid, std::string cname, std::string stream);
 
+  void PlayStream();
+
+  void PauseStream();
+
+  void StopStream();
+
  private slots:
   void OnSearch();
+
+  void OnPlay();
+
+  void OnPause();
+
+  void OnStop();
 
  private:
   QLineEdit *search_edit_;

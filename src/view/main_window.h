@@ -26,6 +26,12 @@ class MainWindow : public QMainWindow
 
   void SearchItem(std::string vid, std::string cname, std::string stream);
 
+  void PlayStream();
+
+  void PauseStream();
+
+  void StopStream();
+
 protected:
   void closeEvent(QCloseEvent *event);
 

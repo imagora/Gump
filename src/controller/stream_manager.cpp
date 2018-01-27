@@ -1,6 +1,10 @@
 #include "stream_manager.h"
+#include <sstream>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <log4cplus/log4cplus.h>
 #include <QTimer>
+#include <QDateTime>
 #include <QSettings>
 #include <QJsonValue>
 #include <QJsonArray>
@@ -71,6 +75,24 @@ std::string StreamManager::ConvertToPlayUrl(const std::string &url)
     }
   }
   return stream.toStdString();
+}
+
+std::string StreamManager::ConvertToToolTip(const StreamInfo &stream)
+{
+  QDateTime date_time;
+  date_time.setTime_t(stream.create_ts);
+
+  in_addr ip_addr = {0};
+  ip_addr.s_addr = ntohl(stream.ip);
+  std::string ip = inet_ntoa(ip_addr);
+
+  std::stringstream ss;
+  ss << "uid: " << stream.user_id << "\n"
+     << "mode: " << (stream.mode == 1 ? "raw" : "mix") << "\n"
+     << "status: " << stream.status << "\n"
+     << "create at: " << date_time.toString("yyyy-MM-dd hh:mm:ss").toStdString() << "\n"
+     << "from server: " << ip;
+  return ss.str();
 }
 
 void StreamManager::UpdateStreamRule()
@@ -164,8 +186,16 @@ void StreamManager::FinishRequest(QNetworkReply *reply)
       QJsonObject stream = stream_value.toObject();
       uint32_t vid = stream.find("vid").value().toInt();
       QString cname = stream.find("cname").value().toString();
+
+      StreamInfo stream_info;
+      stream_info.ip = stream.find("lbes_ip").value().toInt();
+      stream_info.mode = stream.find("mode").value().toInt();
+      stream_info.status = stream.find("status").value().toInt();
+      stream_info.user_id = stream.find("uid").value().toInt();
+      stream_info.create_ts = stream.find("create").value().toInt();
+      stream_info.stream_url = stream.find("url").value().toString().toStdString();
       channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].
-          push_back(stream.find("url").value().toString().toStdString());
+          push_back(stream_info);
     }
   }
 

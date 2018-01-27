@@ -25,16 +25,28 @@ MainToolBar::MainToolBar(QWidget *parent/* = nullptr*/)
   search_edit_ = new QLineEdit(tool_bar);
   QToolButton *search_btn = new QToolButton(tool_bar);
   search_btn->setIcon(QIcon(":/search.png"));
+  QToolButton *play_btn = new QToolButton(tool_bar);
+  play_btn->setIcon(QIcon(":/play.png"));
+  QToolButton *pause_btn = new QToolButton(tool_bar);
+  pause_btn->setIcon(QIcon(":/pause.png"));
+  QToolButton *stop_btn = new QToolButton(tool_bar);
+  stop_btn->setIcon(QIcon(":/stop.png"));
 
   tool_bar_layout->addWidget(search_label);
   tool_bar_layout->addWidget(search_edit_);
   tool_bar_layout->addWidget(search_btn);
+  tool_bar_layout->addWidget(play_btn);
+  tool_bar_layout->addWidget(pause_btn);
+  tool_bar_layout->addWidget(stop_btn);
 
   tool_bar->setLayout(tool_bar_layout);
   addWidget(tool_bar);
 
   connect(search_edit_, SIGNAL(returnPressed()), this, SLOT(OnSearch()));
   connect(search_btn, SIGNAL(released()), this, SLOT(OnSearch()));
+  connect(play_btn, SIGNAL(released()), this, SLOT(OnPlay()));
+  connect(pause_btn, SIGNAL(released()), this, SLOT(OnPause()));
+  connect(stop_btn, SIGNAL(released()), this, SLOT(OnStop()));
 }
 
 MainToolBar::~MainToolBar()
@@ -67,3 +79,19 @@ void MainToolBar::OnSearch()
                      vid.c_str(), cname.c_str(), stream.c_str());
   emit SearchItem(vid, cname, stream);
 }
+
+void MainToolBar::OnPlay()
+{
+  emit PlayStream();
+}
+
+void MainToolBar::OnPause()
+{
+  emit PauseStream();
+}
+
+void MainToolBar::OnStop()
+{
+  emit StopStream();
+}
+

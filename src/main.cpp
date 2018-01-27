@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
   QtAV::Widgets::registerRenderers();
   QApplication a(argc, argv);
   a.setWindowIcon(QIcon(":/icon.png"));
+  QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
   gump::MainWindow w;
   w.show();

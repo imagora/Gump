@@ -28,8 +28,17 @@ class MainCentralWidget : public QWidget
 
   void SearchItem(const std::string &vid, const std::string &cname, const std::string &stream);
 
+  void PlayStream();
+
+  void PauseStream();
+
+  void StopStream();
+
+ protected:
+  void keyReleaseEvent(QKeyEvent *event) override;
+
  private:
-  void InsertRow(const std::string &vid, const std::string &cname, const std::string &stream);
+  void InsertRow(const std::string &vid, const std::string &cname, const StreamInfo &stream);
 
   void RemoveRow(const std::string &vid, const std::string &cname, const std::string &stream);
 
@@ -37,6 +46,17 @@ class MainCentralWidget : public QWidget
 
  private slots:
   void OnPlay(QTableWidgetItem *item);
+
+  void OnPlay(bool);
+
+  void OnCopyStream(bool);
+
+  void OnCopyPlayStream(bool);
+
+  void OnCopyStreamInfo(bool);
+
+  void OnMenu(const QPoint &pos);
+
   void RefreshStreams(ChannelStreams channel_streams);
 
  private:

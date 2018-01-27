@@ -32,6 +32,9 @@ MainWindow::MainWindow(QWidget *parent)
   setWindowState(Qt::WindowMaximized);
   connect(toolbar_, SIGNAL(SearchItem(std::string,std::string,std::string)),
           this, SLOT(SearchItem(std::string,std::string,std::string)));
+  connect(toolbar_, SIGNAL(PlayStream()), this, SLOT(PlayStream()));
+  connect(toolbar_, SIGNAL(PauseStream()), this, SLOT(PauseStream()));
+  connect(toolbar_, SIGNAL(StopStream()), this, SLOT(StopStream()));
 }
 
 
@@ -49,6 +52,21 @@ void MainWindow::SearchItem(std::string vid, std::string cname,
                             std::string stream)
 {
   central_widget_->SearchItem(vid, cname, stream);
+}
+
+void MainWindow::PlayStream()
+{
+  central_widget_->PlayStream();
+}
+
+void MainWindow::PauseStream()
+{
+  central_widget_->PauseStream();
+}
+
+void MainWindow::StopStream()
+{
+  central_widget_->StopStream();
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

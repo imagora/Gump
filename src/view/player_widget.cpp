@@ -30,6 +30,11 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
 
 void PlayerWidget::PlayStream(const std::string &stream)
 {
+  if (stream.empty() && !stream_.empty()) {
+    player_->pause(false);
+    return;
+  }
+
   if (stream_ == stream) return;
   player_->play(QString::fromStdString(stream));
   stream_ = stream;

@@ -27,6 +27,8 @@ class StreamManager : public QObject
 
   std::string ConvertToPlayUrl(const std::string &url);
 
+  std::string ConvertToToolTip(const StreamInfo &stream);
+
   void UpdateStreamRule();
 
  signals:
