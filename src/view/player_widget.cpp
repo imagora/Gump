@@ -16,7 +16,7 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
   QHBoxLayout *layout = new QHBoxLayout();
   setLayout(layout);
 
-  video_output_ = new QtAV::VideoOutput(QtAV::VideoRendererId_GLWidget2, this);
+  video_output_ = new QtAV::VideoOutput(this);
   if (!video_output_->widget()) {
     LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer");
     return;
