@@ -21,11 +21,11 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
     LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer");
     return;
   }
-  video_output_->setOutAspectRatioMode(QtAV::VideoRenderer::RendererAspectRatio);
 
   player_->setRenderer(video_output_);
   layout->addWidget(video_output_->widget());
-  setFixedSize(360, 640);
+  setFixedWidth(300);
+  layout->setMargin(2);
 }
 
 void PlayerWidget::PlayStream(const std::string &stream)
