@@ -34,6 +34,8 @@ class MainCentralWidget : public QWidget
 
   void StopStream();
 
+  void WindowMove();
+
  protected:
   void keyReleaseEvent(QKeyEvent *event) override;
 

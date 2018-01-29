@@ -3,6 +3,9 @@
 #include <log4cplus/log4cplus.h>
 #include <QHBoxLayout>
 #include <QtAVWidgets/global.h>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QScreen>
 
 
 using namespace gump;
@@ -16,14 +19,37 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
   QHBoxLayout *layout = new QHBoxLayout();
   setLayout(layout);
 
-  video_output_ = new QtAV::VideoOutput(this);
-  if (!video_output_->widget()) {
-    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer");
+//  video_output_ = new QtAV::VideoOutput(this);
+//  if (!video_output_->widget()) {
+//    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer");
+//    return;
+//  }
+
+  video_output_retina_ = new QtAV::VideoOutput(QtAV::VideoRendererId_Widget, this);
+  if (!video_output_retina_->widget()) {
+    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer retina");
     return;
   }
 
-  player_->setRenderer(video_output_);
-  layout->addWidget(video_output_->widget());
+  QDesktopWidget *desktop = QApplication::desktop();
+  current_screen_number_ = desktop->screenNumber(this);
+  if (current_screen_number_ < 0) {
+    current_screen_number_ = 0;
+    current_screen_ratio_ = 2;
+  } else {
+    current_screen_ratio_ = desktop->screen(current_screen_number_)->devicePixelRatio();
+  }
+
+//  if (current_screen_ratio_ > 1) {
+//    video_output_->widget()->hide();
+    player_->addVideoRenderer(video_output_retina_);
+//  } else {
+//    video_output_retina_->widget()->hide();
+//    player_->addVideoRenderer(video_output_);
+//  }
+
+//  layout->addWidget(video_output_->widget());
+  layout->addWidget(video_output_retina_->widget());
   setFixedWidth(300);
   layout->setMargin(2);
 }
@@ -63,6 +89,35 @@ void PlayerWidget::StartStream()
 void PlayerWidget::PauseStream()
 {
   player_->pause();
+}
+
+void PlayerWidget::WindowMove()
+{
+  QDesktopWidget *desktop = QApplication::desktop();
+  int screen_number = desktop->screenNumber(this);
+  if (screen_number == current_screen_number_) return;
+  current_screen_number_ = screen_number;
+
+  int screen_ratio = desktop->screen(current_screen_number_)->devicePixelRatio();
+  if (screen_ratio == current_screen_ratio_) return;
+  current_screen_ratio_ = screen_ratio;
+
+  LOG4CPLUS_WARN_FMT(LOGGER_NAME, "screen changed, current number: %d, "
+                                  "current ratio: %d, change video output",
+                     current_screen_number_, current_screen_ratio_);
+//  if (current_screen_ratio_ > 1) {
+//    video_output_->widget()->hide();
+//    player_->removeVideoRenderer(video_output_);
+//    video_output_retina_->widget()->show();
+//    player_->setRenderer(video_output_retina_);
+//    video_output_retina_->setRegionOfInterest(0, 0, 1, 1);
+//  } else {
+//    video_output_retina_->widget()->hide();
+//    player_->removeVideoRenderer(video_output_retina_);
+//    video_output_->widget()->show();
+//    video_output_->setRegionOfInterest(0, 0, 1, 1);
+//    player_->setRenderer(video_output_);
+//  }
 }
 
 

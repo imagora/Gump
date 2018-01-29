@@ -75,4 +75,9 @@ void MainWindow::closeEvent(QCloseEvent *)
   log4cplus::Logger::getInstance(LOGGER_NAME).removeAllAppenders();
 }
 
+void MainWindow::moveEvent(QMoveEvent *)
+{
+  central_widget_->WindowMove();
+}
+
 

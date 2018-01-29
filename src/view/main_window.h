@@ -33,7 +33,9 @@ class MainWindow : public QMainWindow
   void StopStream();
 
 protected:
-  void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent *event) override;
+
+  void moveEvent(QMoveEvent *event) override;
 
  private:
   LogDock *log_dock_;

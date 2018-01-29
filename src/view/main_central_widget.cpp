@@ -153,6 +153,11 @@ void MainCentralWidget::StopStream()
   player_widget_->StopStream();
 }
 
+void MainCentralWidget::WindowMove()
+{
+  player_widget_->WindowMove();
+}
+
 void MainCentralWidget::keyReleaseEvent(QKeyEvent *event)
 {
   if (event->key() != Qt::Key_Up && event->key() != Qt::Key_Down) {
