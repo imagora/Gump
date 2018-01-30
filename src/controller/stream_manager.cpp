@@ -21,16 +21,17 @@ using namespace gump;
 StreamManager::StreamManager(QObject *parent)
   : QObject(parent)
 {
-  UpdateStreamRule();
-  network_mgr_ = new QNetworkAccessManager(this);
-  connect(network_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishRequest(QNetworkReply*)));
+  rule_mgr_ = new QNetworkAccessManager(this);
+  online_mgr_ = new QNetworkAccessManager(this);
+  connect(rule_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishRuleRequest(QNetworkReply*)));
+  connect(online_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishOnlineRequest(QNetworkReply*)));
   QTimer::singleShot(1000, this, SLOT(RefreshChannelStreamsTimer()));
+
+  UpdateStreamRule();
 }
 
 StreamManager::~StreamManager()
 {
-  delete network_mgr_;
-  network_mgr_ = nullptr;
 }
 
 void StreamManager::PlayStream(const std::string &command)
@@ -99,13 +100,47 @@ void StreamManager::UpdateStreamRule()
 {
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
-  std::string rule = settings.value("rule").toString().toStdString();
+  QString rule_url = settings.value("rule_url").toString();
+  QString username = settings.value("rule_username").toString();
+  QString password = settings.value("rule_password").toString();
   settings.endGroup();
 
+  if (rule_url.isEmpty()) return;
+
+  QString concatenated = username + ":" + password;
+  QByteArray data = concatenated.toLocal8Bit().toBase64();
+  QString headerData = "Basic " + data;
+
+  QNetworkRequest request = QNetworkRequest(QUrl(rule_url));
+  request.setRawHeader("Authorization", headerData.toLocal8Bit());
+  rule_mgr_->get(request);
+}
+
+void StreamManager::RefreshChannelStreams()
+{
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("preferences");
+  QString url = settings.value("online_url").toString();
+  settings.endGroup();
+
+  if (url.isEmpty()) return;
+
+  online_mgr_->get(QNetworkRequest(QUrl(url)));
+}
+
+void StreamManager::RefreshChannelStreamsTimer()
+{
+  RefreshChannelStreams();
+  QTimer::singleShot(5 * 60 * 1000, this, SLOT(RefreshChannelStreamsTimer()));
+}
+
+void StreamManager::FinishRuleRequest(QNetworkReply *reply)
+{
+  QByteArray data = reply->readAll();
   QJsonParseError parse_err;
-  QJsonDocument rule_json = QJsonDocument::fromJson(rule.c_str(), &parse_err);
+  QJsonDocument rule_json = QJsonDocument::fromJson(data, &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Parse rule(json) error: %s", rule.c_str());
+    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Parse rule(json) error");
     return;
   }
 
@@ -136,23 +171,7 @@ void StreamManager::UpdateStreamRule()
   new_rules.swap(rules_);
 }
 
-void StreamManager::RefreshChannelStreams()
-{
-  QSettings settings("agora.io", "gump");
-  settings.beginGroup("preferences");
-  std::string url = settings.value("url").toString().toStdString();
-  settings.endGroup();
-
-  network_mgr_->get(QNetworkRequest(QUrl(url.c_str())));
-}
-
-void StreamManager::RefreshChannelStreamsTimer()
-{
-  RefreshChannelStreams();
-  QTimer::singleShot(5 * 60 * 1000, this, SLOT(RefreshChannelStreamsTimer()));
-}
-
-void StreamManager::FinishRequest(QNetworkReply *reply)
+void StreamManager::FinishOnlineRequest(QNetworkReply *reply)
 {
   QByteArray data = reply->readAll();
   QJsonParseError parse_err;

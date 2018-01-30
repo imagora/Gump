@@ -3,6 +3,7 @@
 #include "controller/stream_manager.h"
 #include <log4cplus/log4cplus.h>
 #include <QTableWidgetItem>
+#include <QDesktopServices>
 #include <QTableWidget>
 #include <QApplication>
 #include <QVBoxLayout>
@@ -275,7 +276,7 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
 
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
-  cmd = settings.value("player").toString().toStdString();
+  cmd = settings.value("external_player").toString().toStdString();
   settings.endGroup();
   if (cmd.empty()) return;
   if (cmd.find("ffplay") != std::string::npos) {
@@ -293,6 +294,21 @@ void MainCentralWidget::OnPlay(bool)
   int row = stream_table_->currentRow();
   QTableWidgetItem *item = stream_table_->item(row, 2);
   OnPlay(item);
+}
+
+void MainCentralWidget::OnTracer(bool)
+{
+  int row = stream_table_->currentRow();
+  QTableWidgetItem *vid_item = stream_table_->item(row, 0);
+  QString vid = vid_item->text();
+  QTableWidgetItem *cname_item = stream_table_->item(row, 1);
+  QString cname = cname_item->text();
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("preferences");
+  QString url = settings.value("tracer_url").toString();
+  settings.endGroup();
+  url += ("?vid=" + vid + "&querystring=cname:" + cname);
+  QDesktopServices::openUrl(QUrl(url));
 }
 
 void MainCentralWidget::OnCopyStream(bool)
@@ -331,16 +347,19 @@ void MainCentralWidget::OnMenu(const QPoint &pos)
   QMenu *menu = new QMenu(this);
 
   QAction *play_action = new QAction("Play Stream", menu);
+  QAction *open_tracer_action = new QAction("Open Tracer", menu);
   QAction *url_action = new QAction("Copy Stream Url", menu);
   QAction *play_url_action = new QAction("Copy Stream Play Url", menu);
   QAction *info_action = new QAction("Copy Stream Detail Info", menu);
 
   connect(play_action, SIGNAL(triggered(bool)), SLOT(OnPlay(bool)));
+  connect(open_tracer_action, SIGNAL(triggered(bool)), SLOT(OnTracer(bool)));
   connect(url_action, SIGNAL(triggered(bool)), SLOT(OnCopyStream(bool)));
   connect(play_url_action, SIGNAL(triggered(bool)), SLOT(OnCopyPlayStream(bool)));
   connect(info_action, SIGNAL(triggered(bool)), SLOT(OnCopyStreamInfo(bool)));
 
   menu->addAction(play_action);
+  menu->addAction(open_tracer_action);
   menu->addAction(url_action);
   menu->addAction(play_url_action);
   menu->addAction(info_action);

@@ -40,11 +40,14 @@ class StreamManager : public QObject
  private slots:
   void RefreshChannelStreamsTimer();
 
-  void FinishRequest(QNetworkReply *reply);
+  void FinishRuleRequest(QNetworkReply *reply);
+
+  void FinishOnlineRequest(QNetworkReply *reply);
 
  private:
   Rules rules_;
-  QNetworkAccessManager *network_mgr_;
+  QNetworkAccessManager *rule_mgr_;
+  QNetworkAccessManager *online_mgr_;
 };
 
 

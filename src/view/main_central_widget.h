@@ -51,6 +51,8 @@ class MainCentralWidget : public QWidget
 
   void OnPlay(bool);
 
+  void OnTracer(bool);
+
   void OnCopyStream(bool);
 
   void OnCopyPlayStream(bool);

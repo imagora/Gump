@@ -3,7 +3,6 @@
 
 
 class QLineEdit;
-class QTextEdit;
 class QSettings;
 class QGridLayout;
 
@@ -28,9 +27,12 @@ class PreferencesDialog : public QDialog
   void OnCancel();
 
  private:
-  QLineEdit *url_input_;
-  QLineEdit *player_input_;
-  QTextEdit *stream_rule_;
+  QLineEdit *online_url_input_;
+  QLineEdit *external_player_input_;
+  QLineEdit *rule_url_input_;
+  QLineEdit *rule_username_input_;
+  QLineEdit *rule_password_input_;
+  QLineEdit *tracer_url_input_;
   QGridLayout *layout_;
   QSettings *settings_;
 };
