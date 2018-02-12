@@ -26,7 +26,6 @@ class PlayerWidget : public QWidget
   int current_screen_number_;
   int current_screen_ratio_;
   QtAV::VideoOutput *video_output_;
-  QtAV::VideoOutput *video_output_retina_;
   QtAV::AVPlayer *player_;
   std::string stream_;
 };
