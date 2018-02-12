@@ -2,29 +2,34 @@
 #include "commons/definations.h"
 #include <log4cplus/log4cplus.h>
 #include <QHBoxLayout>
+#include <QStackedLayout>
 #include <QtAVWidgets/global.h>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QScreen>
+#include <QLabel>
+#include <QPalette>
 
 
 using namespace gump;
 
 
+const static std::map<uint32_t, std::string> kStatusStr = {
+  { QtAV::UnknownMediaStatus, "Unknown" },
+  { QtAV::NoMedia, "No Media" },
+  { QtAV::LoadingMedia, "Loading Media" },
+  { QtAV::LoadedMedia, "Loaded Media" },
+  { QtAV::StalledMedia, "Stalled Media" },
+  { QtAV::BufferingMedia, "Buffering Media" },
+  { QtAV::BufferedMedia, "Buffered Media" },
+  { QtAV::EndOfMedia, "End Of Media" },
+  { QtAV::InvalidMedia, "Invalid Media" },
+};
+
+
 PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
   : QWidget(parent)
 {
-  player_ = new QtAV::AVPlayer(this);
-
-  QHBoxLayout *layout = new QHBoxLayout();
-  setLayout(layout);
-
-  video_output_ = new QtAV::VideoOutput(QtAV::VideoRendererId_Widget, this);
-  if (!video_output_->widget()) {
-    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer retina");
-    return;
-  }
-
   QDesktopWidget *desktop = QApplication::desktop();
   current_screen_number_ = desktop->screenNumber(this);
   if (current_screen_number_ < 0) {
@@ -34,10 +39,35 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
     current_screen_ratio_ = desktop->screen(current_screen_number_)->devicePixelRatio();
   }
 
+  QHBoxLayout *main_layout = new QHBoxLayout();
+  QStackedLayout *stacked_layout = new QStackedLayout();
+  stacked_layout->setMargin(2);
+  stacked_layout->setStackingMode(QStackedLayout::StackAll);
+
+  video_output_ = new QtAV::VideoOutput(QtAV::VideoRendererId_Widget, this);
+  if (!video_output_->widget()) {
+    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Error: can not create video renderer retina");
+    return;
+  }
+
+  player_ = new QtAV::AVPlayer(this);
   player_->addVideoRenderer(video_output_);
-  layout->addWidget(video_output_->widget());
+  player_status_ = new QLabel("---", this);
+  QPalette pe;
+  pe.setColor(QPalette::WindowText, Qt::red);
+  player_status_->setPalette(pe);
+  player_status_->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+
+  stacked_layout->addWidget(player_status_);
+  stacked_layout->addWidget(video_output_->widget());
   setFixedWidth(300);
-  layout->setMargin(2);
+
+  main_layout->addLayout(stacked_layout);
+  setLayout(main_layout);
+  player_status_->raise();
+
+  connect(player_, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
+  connect(player_, SIGNAL(error(QtAV::AVError)), this, SLOT(OnPlayerError(QtAV::AVError)));
 }
 
 void PlayerWidget::PlayStream(const std::string &stream)
@@ -91,6 +121,24 @@ void PlayerWidget::WindowMove()
   LOG4CPLUS_WARN_FMT(LOGGER_NAME, "screen changed, current number: %d, "
                                   "current ratio: %d, change video output",
                      current_screen_number_, current_screen_ratio_);
+}
+
+void PlayerWidget::OnMediaStatusChanged(QtAV::MediaStatus status)
+{
+  auto iter = kStatusStr.find(status);
+  if (iter == kStatusStr.end()) {
+    player_status_->setText("---");
+    player_status_->raise();
+    return;
+  }
+  player_status_->setText(iter->second.c_str());
+  player_status_->raise();
+}
+
+void PlayerWidget::OnPlayerError(const QtAV::AVError &e)
+{
+  LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "player error[%d]: %s", e.error(),
+                      e.string().toLatin1().data());
 }
 
 
