@@ -3,6 +3,12 @@
 #include <vector>
 #include <string>
 
+#define BUILD_DATE_TIME __DATE__ " " __TIME__
+
+#if !defined(BUILD_VERSION)
+#define BUILD_VERSION "Unknown"
+#endif
+
 
 namespace gump {
 
