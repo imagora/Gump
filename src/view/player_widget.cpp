@@ -9,6 +9,7 @@
 #include <QScreen>
 #include <QLabel>
 #include <QPalette>
+#include <QTimer>
 
 
 using namespace gump;
@@ -52,7 +53,7 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
 
   player_ = new QtAV::AVPlayer(this);
   player_->addVideoRenderer(video_output_);
-  player_status_ = new QLabel("---", this);
+  player_status_ = new QLabel(PlayerStatus(), this);
   QPalette pe;
   pe.setColor(QPalette::WindowText, Qt::red);
   player_status_->setPalette(pe);
@@ -68,6 +69,7 @@ PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
 
   connect(player_, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
   connect(player_, SIGNAL(error(QtAV::AVError)), this, SLOT(OnPlayerError(QtAV::AVError)));
+  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
 }
 
 void PlayerWidget::PlayStream(const std::string &stream)
@@ -125,13 +127,7 @@ void PlayerWidget::WindowMove()
 
 void PlayerWidget::OnMediaStatusChanged(QtAV::MediaStatus status)
 {
-  auto iter = kStatusStr.find(status);
-  if (iter == kStatusStr.end()) {
-    player_status_->setText("---");
-    player_status_->raise();
-    return;
-  }
-  player_status_->setText(iter->second.c_str());
+  player_status_->setText(PlayerStatus(status));
   player_status_->raise();
 }
 
@@ -139,6 +135,48 @@ void PlayerWidget::OnPlayerError(const QtAV::AVError &e)
 {
   LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "player error[%d]: %s", e.error(),
                       e.string().toLatin1().data());
+}
+
+void PlayerWidget::RefreshMediaInfoTimer()
+{
+  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
+  if (!player_->isPlaying()) {
+    return;
+  }
+
+  QString player_status = PlayerStatus();
+  const QtAV::Statistics &avstat = player_->statistics();
+  if (avstat.audio.available) {
+    player_status += "\nAudio:";
+    player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.audio.codec);
+    player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.audio.bit_rate);
+    player_status += QString::fromLatin1("\n\tSamplerate: %1").arg(avstat.audio_only.sample_rate);
+    player_status += QString::fromLatin1("\n\tAudioChannels: %1").arg(avstat.audio_only.channels);
+  }
+
+  if (avstat.video.available) {
+    player_status += "\nVideo:";
+    player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
+    player_status += QString::fromLatin1("\n\tFPS: %1").arg(avstat.video.frame_rate);
+    player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
+    player_status += QString::fromLatin1("\n\tResolution: %1x%2").arg(avstat.video_only.width).arg(avstat.video_only.height);
+  }
+
+  player_status_->setText(player_status);
+  player_status_->raise();
+}
+
+QString PlayerWidget::PlayerStatus(uint32_t status)
+{
+  if (status == QtAV::UnknownMediaStatus) {
+    status = player_->mediaStatus();
+  }
+
+  auto iter = kStatusStr.find(status);
+  if (iter == kStatusStr.end()) {
+    iter = kStatusStr.begin();
+  }
+  return iter->second.c_str();
 }
 
 

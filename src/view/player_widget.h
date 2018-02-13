@@ -30,6 +30,11 @@ class PlayerWidget : public QWidget
 
   void OnPlayerError(const QtAV::AVError& e);
 
+  void RefreshMediaInfoTimer();
+
+ private:
+  QString PlayerStatus(uint32_t status = 0);
+
  private:
   int current_screen_number_;
   int current_screen_ratio_;
