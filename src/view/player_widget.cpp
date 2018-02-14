@@ -157,7 +157,7 @@ void PlayerWidget::RefreshMediaInfoTimer()
   if (avstat.video.available) {
     player_status += "\nVideo:";
     player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
-    player_status += QString::fromLatin1("\n\tFPS: %1").arg(avstat.video.frame_rate);
+    player_status += QString::fromLatin1("\n\tFPS: %1").arg(avstat.video_only.currentDisplayFPS());
     player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
     player_status += QString::fromLatin1("\n\tResolution: %1x%2").arg(avstat.video_only.width).arg(avstat.video_only.height);
   }
