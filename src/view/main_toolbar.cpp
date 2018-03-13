@@ -31,13 +31,18 @@ MainToolBar::MainToolBar(QWidget *parent/* = nullptr*/)
   pause_btn->setIcon(QIcon(":/pause.png"));
   QToolButton *stop_btn = new QToolButton(tool_bar);
   stop_btn->setIcon(QIcon(":/stop.png"));
+  QToolButton *details_btn = new QToolButton(tool_bar);
+  details_btn->setIcon(QIcon(":/details.png"));
 
   tool_bar_layout->addWidget(search_label);
   tool_bar_layout->addWidget(search_edit_);
   tool_bar_layout->addWidget(search_btn);
+
   tool_bar_layout->addWidget(play_btn);
   tool_bar_layout->addWidget(pause_btn);
   tool_bar_layout->addWidget(stop_btn);
+
+  tool_bar_layout->addWidget(details_btn);
 
   tool_bar->setLayout(tool_bar_layout);
   addWidget(tool_bar);
@@ -47,6 +52,7 @@ MainToolBar::MainToolBar(QWidget *parent/* = nullptr*/)
   connect(play_btn, SIGNAL(released()), this, SLOT(OnPlay()));
   connect(pause_btn, SIGNAL(released()), this, SLOT(OnPause()));
   connect(stop_btn, SIGNAL(released()), this, SLOT(OnStop()));
+  connect(details_btn, SIGNAL(released()), this, SLOT(OnDetails()));
 }
 
 MainToolBar::~MainToolBar()
@@ -93,5 +99,10 @@ void MainToolBar::OnPause()
 void MainToolBar::OnStop()
 {
   emit StopStream();
+}
+
+void MainToolBar::OnDetails()
+{
+  emit ShowDetails();
 }
 

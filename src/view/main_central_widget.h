@@ -34,6 +34,8 @@ class MainCentralWidget : public QWidget
 
   void StopStream();
 
+  void ShowDetails();
+
   void WindowMove();
 
  protected:

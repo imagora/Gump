@@ -32,6 +32,8 @@ class MainWindow : public QMainWindow
 
   void StopStream();
 
+  void ShowDetails();
+
 protected:
   void closeEvent(QCloseEvent *event) override;
 

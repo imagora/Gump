@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(toolbar_, SIGNAL(PlayStream()), this, SLOT(PlayStream()));
   connect(toolbar_, SIGNAL(PauseStream()), this, SLOT(PauseStream()));
   connect(toolbar_, SIGNAL(StopStream()), this, SLOT(StopStream()));
+  connect(toolbar_, SIGNAL(ShowDetails()), this, SLOT(ShowDetails()));
 }
 
 
@@ -67,6 +68,11 @@ void MainWindow::PauseStream()
 void MainWindow::StopStream()
 {
   central_widget_->StopStream();
+}
+
+void MainWindow::ShowDetails()
+{
+  central_widget_->ShowDetails();
 }
 
 void MainWindow::closeEvent(QCloseEvent *)

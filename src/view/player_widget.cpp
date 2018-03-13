@@ -31,6 +31,8 @@ const static std::map<uint32_t, std::string> kStatusStr = {
 PlayerWidget::PlayerWidget(QWidget *parent/* = nullptr*/)
   : QWidget(parent)
 {
+  is_show_details_ = false;
+
   QDesktopWidget *desktop = QApplication::desktop();
   current_screen_number_ = desktop->screenNumber(this);
   if (current_screen_number_ < 0) {
@@ -109,6 +111,11 @@ void PlayerWidget::PauseStream()
   player_->pause();
 }
 
+void PlayerWidget::ShowDetails()
+{
+  is_show_details_ = !is_show_details_;
+}
+
 void PlayerWidget::WindowMove()
 {
   QDesktopWidget *desktop = QApplication::desktop();
@@ -145,21 +152,23 @@ void PlayerWidget::RefreshMediaInfoTimer()
   }
 
   QString player_status = PlayerStatus();
-  const QtAV::Statistics &avstat = player_->statistics();
-  if (avstat.audio.available) {
-    player_status += "\nAudio:";
-    player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.audio.codec);
-    player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.audio.bit_rate);
-    player_status += QString::fromLatin1("\n\tSamplerate: %1").arg(avstat.audio_only.sample_rate);
-    player_status += QString::fromLatin1("\n\tAudioChannels: %1").arg(avstat.audio_only.channels);
-  }
+  if (is_show_details_) {
+    const QtAV::Statistics &avstat = player_->statistics();
+    if (avstat.audio.available) {
+      player_status += "\nAudio:";
+      player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.audio.codec);
+      player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.audio.bit_rate);
+      player_status += QString::fromLatin1("\n\tSamplerate: %1").arg(avstat.audio_only.sample_rate);
+      player_status += QString::fromLatin1("\n\tAudioChannels: %1").arg(avstat.audio_only.channels);
+    }
 
-  if (avstat.video.available) {
-    player_status += "\nVideo:";
-    player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
-    player_status += QString::fromLatin1("\n\tFPS: %1").arg(avstat.video_only.currentDisplayFPS());
-    player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
-    player_status += QString::fromLatin1("\n\tResolution: %1x%2").arg(avstat.video_only.width).arg(avstat.video_only.height);
+    if (avstat.video.available) {
+      player_status += "\nVideo:";
+      player_status += QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
+      player_status += QString::fromLatin1("\n\tFPS: %1").arg(avstat.video_only.currentDisplayFPS());
+      player_status += QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
+      player_status += QString::fromLatin1("\n\tResolution: %1x%2").arg(avstat.video_only.width).arg(avstat.video_only.height);
+    }
   }
 
   player_status_->setText(player_status);

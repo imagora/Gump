@@ -154,6 +154,11 @@ void MainCentralWidget::StopStream()
   player_widget_->StopStream();
 }
 
+void MainCentralWidget::ShowDetails()
+{
+  player_widget_->ShowDetails();
+}
+
 void MainCentralWidget::WindowMove()
 {
   player_widget_->WindowMove();

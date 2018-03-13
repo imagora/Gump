@@ -5,5 +5,6 @@
         <file alias="play.png">Resource/play.png</file>
         <file alias="pause.png">Resource/pause.png</file>
         <file alias="stop.png">Resource/stop.png</file>
+        <file alias="details.png">Resource/details.png</file>
     </qresource>
 </RCC>

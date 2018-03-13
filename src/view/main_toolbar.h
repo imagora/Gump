@@ -26,6 +26,8 @@ class MainToolBar : public QToolBar
 
   void StopStream();
 
+  void ShowDetails();
+
  private slots:
   void OnSearch();
 
@@ -34,6 +36,8 @@ class MainToolBar : public QToolBar
   void OnPause();
 
   void OnStop();
+
+  void OnDetails();
 
  private:
   QLineEdit *search_edit_;

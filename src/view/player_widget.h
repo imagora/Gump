@@ -23,6 +23,8 @@ class PlayerWidget : public QWidget
 
   void PauseStream();
 
+  void ShowDetails();
+
   void WindowMove();
 
  private slots:
@@ -36,6 +38,7 @@ class PlayerWidget : public QWidget
   QString PlayerStatus(uint32_t status = 0);
 
  private:
+  bool is_show_details_;
   int current_screen_number_;
   int current_screen_ratio_;
   QtAV::VideoOutput *video_output_;
