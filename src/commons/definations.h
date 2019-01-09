@@ -1,4 +1,8 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
 #include <map>
 #include <vector>
 #include <string>
@@ -14,19 +18,18 @@ namespace gump {
 
 
 enum LogLevel {
-  TRACE_LOG_LEVEL   = 0,
-  DEBUG_LOG_LEVEL   = 1,
-  INFO_LOG_LEVEL    = 2,
-  WARN_LOG_LEVEL    = 3,
-  ERROR_LOG_LEVEL   = 4,
-  FATAL_LOG_LEVEL   = 5,
-  LOG_LEVEL_BUTT    = 6,
+  kTrace = 0,
+  kDebug = 1,
+  kInfo = 2,
+  kWarn = 3,
+  kError = 4,
+  kFatal = 5,
+  kLogButt = 6,
 };
 
-const static std::string LOGGER_NAME("GUMP");
+static const char kLoggerName[] = "GUMP";
 
-struct StreamInfo
-{
+struct StreamInfo {
   uint32_t ip;
   uint32_t mode;
   uint32_t status;
@@ -39,4 +42,4 @@ typedef std::pair<std::string, std::string> ChannelKey;
 typedef std::vector<StreamInfo> Streams;
 typedef std::map<ChannelKey, Streams> ChannelStreams;
 
-}
+}  // namespace gump

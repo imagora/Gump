@@ -1,21 +1,25 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
 #include <QToolBar>
+#include <QLineEdit>
 
-
-class QLineEdit;
+#include <string>
 
 
 namespace gump {
 
 
-class MainToolBar : public QToolBar
-{
+class MainToolBar :
+    public QToolBar {
   Q_OBJECT
 
  public:
-  MainToolBar(QWidget *parent = nullptr);
+  explicit MainToolBar(QWidget *parent = nullptr);
 
-  ~MainToolBar();
+  virtual ~MainToolBar();
 
  signals:
   void SearchItem(std::string vid, std::string cname, std::string stream);
@@ -41,9 +45,8 @@ class MainToolBar : public QToolBar
 
  private:
   QLineEdit *search_edit_;
-
 };
 
 
-}
+}  // namespace gump
 

@@ -1,19 +1,27 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
+#include <QLabel>
+#include <QString>
 #include <QWidget>
 #include <QtAV/QtAV>
 
-
-class QLabel;
+#include <string>
 
 
 namespace gump {
 
 
-class PlayerWidget : public QWidget
-{
+class PlayerWidget :
+    public QWidget {
   Q_OBJECT
+
  public:
-  PlayerWidget(QWidget *parent = nullptr);
+  explicit PlayerWidget(QWidget *parent = nullptr);
+
+  virtual ~PlayerWidget();
 
   void PlayStream(const std::string &stream);
 
@@ -48,4 +56,4 @@ class PlayerWidget : public QWidget
 };
 
 
-}
+}  // namespace gump

@@ -1,8 +1,12 @@
-#include "stream_manager.h"
-#include <sstream>
+// Copyright (c) 2014-2019 winking324
+//
+
+#include "controller/preferences_manager.h"
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <log4cplus/log4cplus.h>
+
 #include <QTimer>
 #include <QDateTime>
 #include <QSettings>
@@ -10,40 +14,38 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QNetworkAccessManager>
+
+#include <sstream>
 
 
-using namespace gump;
+namespace gump {
 
 
-StreamManager::StreamManager(QObject *parent)
-  : QObject(parent)
-{
-  rule_mgr_ = new QNetworkAccessManager(this);
+PreferencesManager::PreferencesManager(QObject *parent)
+    : QObject(parent) {
+  config_mgr_ = new QNetworkAccessManager(this);
   online_mgr_ = new QNetworkAccessManager(this);
-  connect(rule_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishRuleRequest(QNetworkReply*)));
-  connect(online_mgr_, SIGNAL(finished(QNetworkReply*)), this, SLOT(FinishOnlineRequest(QNetworkReply*)));
+  connect(config_mgr_, SIGNAL(finished(QNetworkReply*)), this,
+          SLOT(FinishConfigRequest(QNetworkReply*)));
+  connect(online_mgr_, SIGNAL(finished(QNetworkReply*)), this,
+          SLOT(FinishOnlineRequest(QNetworkReply*)));
   QTimer::singleShot(1000, this, SLOT(RefreshChannelStreamsTimer()));
 
-  UpdateStreamRule();
+  UpdatePreferences();
 }
 
-StreamManager::~StreamManager()
-{
+PreferencesManager::~PreferencesManager() {
 }
 
-void StreamManager::PlayStream(const std::string &command)
-{
+void PreferencesManager::PlayStream(const std::string &command) {
   FILE* fp = popen(command.c_str(), "r");
-  if (fp == NULL) {
-    LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Failed to run cmd: %s", command.c_str());
+  if (fp == nullptr) {
+    LOG4CPLUS_WARN(kLoggerName, "Failed to run cmd: " << command);
   }
 }
 
-std::string StreamManager::ConvertToPlayUrl(const std::string &url)
-{
+std::string PreferencesManager::ConvertToPlayUrl(const std::string &url) {
   std::pair<std::string, std::string> re{"", ""};
   for (auto host : rules_) {
     if (url.find(host.first) == std::string::npos) {
@@ -78,8 +80,7 @@ std::string StreamManager::ConvertToPlayUrl(const std::string &url)
   return stream.toStdString();
 }
 
-std::string StreamManager::ConvertToToolTip(const StreamInfo &stream)
-{
+std::string PreferencesManager::ConvertToToolTip(const StreamInfo &stream) {
   QDateTime date_time;
   date_time.setTime_t(stream.create_ts);
 
@@ -91,93 +92,122 @@ std::string StreamManager::ConvertToToolTip(const StreamInfo &stream)
   ss << "uid: " << stream.user_id << "\n"
      << "mode: " << (stream.mode == 1 ? "raw" : "mix") << "\n"
      << "status: " << stream.status << "\n"
-     << "create at: " << date_time.toString("yyyy-MM-dd hh:mm:ss").toStdString() << "\n"
+     << "create at: " << date_time.toString("yyyy-MM-dd hh:mm:ss").toStdString()
+     << "\n"
      << "from server: " << ip;
   return ss.str();
 }
 
-void StreamManager::UpdateStreamRule()
-{
+std::string PreferencesManager::QueryConfig(const std::string &key) {
+  auto it = configs_.find(key);
+  if (it == configs_.end()) return "";
+
+  return it->second;
+}
+
+void PreferencesManager::UpdatePreferences() {
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
-  QString rule_url = settings.value("rule_url").toString();
-  QString username = settings.value("rule_username").toString();
-  QString password = settings.value("rule_password").toString();
+  QString config_url = settings.value("config_url").toString();
+  QString username = settings.value("config_username").toString();
+  QString password = settings.value("config_password").toString();
   settings.endGroup();
 
-  if (rule_url.isEmpty()) return;
+  if (config_url.isEmpty()) {
+    LOG4CPLUS_WARN(kLoggerName, "cannot get config url");
+    return;
+  }
 
   QString concatenated = username + ":" + password;
   QByteArray data = concatenated.toLocal8Bit().toBase64();
   QString headerData = "Basic " + data;
 
-  QNetworkRequest request = QNetworkRequest(QUrl(rule_url));
+  QNetworkRequest request = QNetworkRequest(QUrl(config_url));
   request.setRawHeader("Authorization", headerData.toLocal8Bit());
-  rule_mgr_->get(request);
+  config_mgr_->get(request);
 }
 
-void StreamManager::RefreshChannelStreams()
-{
+void PreferencesManager::RefreshChannelStreams() {
+  QString url = QString::fromStdString(QueryConfig("online_url"));
+  if (url.isEmpty()) return;
+
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
-  QString url = settings.value("online_url").toString();
+  QString vid = settings.value("vid").toString();
+  QString max = settings.value("max").toString();
   settings.endGroup();
 
-  if (url.isEmpty()) return;
+  url += "?page_size=" + max;
+  if (vid != "0") {
+    url += "&vid=" + vid;
+  }
 
   online_mgr_->get(QNetworkRequest(QUrl(url)));
 }
 
-void StreamManager::RefreshChannelStreamsTimer()
-{
+void PreferencesManager::RefreshChannelStreamsTimer() {
   RefreshChannelStreams();
   QTimer::singleShot(5 * 60 * 1000, this, SLOT(RefreshChannelStreamsTimer()));
 }
 
-void StreamManager::FinishRuleRequest(QNetworkReply *reply)
-{
+void PreferencesManager::FinishConfigRequest(QNetworkReply *reply) {
   QByteArray data = reply->readAll();
   QJsonParseError parse_err;
   QJsonDocument rule_json = QJsonDocument::fromJson(data, &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Parse rule(json) error");
+    LOG4CPLUS_ERROR(kLoggerName, "Parse rule(json) error");
     return;
   }
 
-  Rules new_rules;
+  std::map<std::string, std::string> new_configs;
+  std::map<std::string, std::pair<std::string, std::string>> new_rules;
   if (rule_json.isObject()) {
     QJsonObject obj = rule_json.object();
     for (QJsonObject::Iterator iter = obj.begin(); iter != obj.end(); ++iter) {
-      RuleKey key = iter.key().toStdString();
+      std::string key = iter.key().toStdString();
 
-      if (!iter.value().isObject()) {
-        LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Cannot get rule for key: %s", key.c_str());
+      if (key != "rules") {
+        new_configs.insert(
+              std::make_pair(key, iter.value().toString().toStdString()));
         continue;
       }
 
-      QJsonObject rule_obj = iter.value().toObject();
-      QJsonValue re_val = rule_obj["re"];
-      QJsonValue url_val = rule_obj["url"];
-      if (re_val == QJsonValue::Undefined || url_val == QJsonValue::Undefined) {
-        LOG4CPLUS_ERROR_FMT(LOGGER_NAME, "Cannot get re and url from value: %s", key.c_str());
-        continue;
-      }
+      QJsonObject rules_obj = iter.value().toObject();
+      for (auto rule_it = rules_obj.begin(); rule_it != rules_obj.end();
+           ++rule_it) {
+        std::string rule_key = rule_it.key().toStdString();
 
-      new_rules[key] = std::make_pair(re_val.toString().toStdString(),
-                                      url_val.toString().toStdString());
+        if (!rule_it.value().isObject()) {
+          LOG4CPLUS_ERROR(kLoggerName, "Cannot get rule for key: " << key);
+          continue;
+        }
+
+        QJsonObject rule_obj = rule_it.value().toObject();
+        QJsonValue re_val = rule_obj["re"];
+        QJsonValue url_val = rule_obj["url"];
+        if (re_val == QJsonValue::Undefined ||
+            url_val == QJsonValue::Undefined) {
+          LOG4CPLUS_ERROR(kLoggerName,
+                          "Cannot get re and url from value: " << key);
+          continue;
+        }
+
+        new_rules[rule_key] = std::make_pair(re_val.toString().toStdString(),
+                                             url_val.toString().toStdString());
+      }
     }
   }
 
+  new_configs.swap(configs_);
   new_rules.swap(rules_);
 }
 
-void StreamManager::FinishOnlineRequest(QNetworkReply *reply)
-{
+void PreferencesManager::FinishOnlineRequest(QNetworkReply *reply) {
   QByteArray data = reply->readAll();
   QJsonParseError parse_err;
   QJsonDocument doc = QJsonDocument::fromJson(data, &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Parse stream info error");
+    LOG4CPLUS_ERROR(kLoggerName, "Parse stream info error");
     return;
   }
 
@@ -187,18 +217,18 @@ void StreamManager::FinishOnlineRequest(QNetworkReply *reply)
     auto success_iter = obj.find("success");
     if (success_iter.value().type() != QJsonValue::Bool ||
         !success_iter.value().toBool()) {
-      LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Request streams failed, success error");
+      LOG4CPLUS_ERROR(kLoggerName, "Request streams failed, success error");
       return;
     }
 
     auto data_iter = obj.find("data");
     if (data_iter.value().type() != QJsonValue::Object) {
-      LOG4CPLUS_ERROR_STR(LOGGER_NAME, "Request streams failed, no data");
+      LOG4CPLUS_ERROR(kLoggerName, "Request streams failed, no data");
       return;
     }
     QJsonObject data = data_iter.value().toObject();
     int total_count = data.find("total_count").value().toInt();
-    LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Total stream count: %d", total_count);
+    LOG4CPLUS_INFO(kLoggerName, "Total stream count: " << total_count);
 
     QJsonArray streams = data.find("streams").value().toArray();
     foreach (QJsonValue stream_value, streams) {
@@ -212,7 +242,8 @@ void StreamManager::FinishOnlineRequest(QNetworkReply *reply)
       stream_info.status = stream.find("status").value().toInt();
       stream_info.user_id = stream.find("uid").value().toInt();
       stream_info.create_ts = stream.find("create").value().toInt();
-      stream_info.stream_url = stream.find("url").value().toString().toStdString();
+      stream_info.stream_url =
+          stream.find("url").value().toString().toStdString();
       channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].
           push_back(stream_info);
     }
@@ -220,4 +251,7 @@ void StreamManager::FinishOnlineRequest(QNetworkReply *reply)
 
   emit Refresh(channel_streams);
 }
+
+
+}  // namespace gump
 

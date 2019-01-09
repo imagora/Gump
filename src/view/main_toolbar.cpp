@@ -1,20 +1,23 @@
-#include "main_toolbar.h"
-#include "commons/definations.h"
+// Copyright (c) 2014-2019 winking324
+//
+
+#include "view/main_toolbar.h"
+
 #include <log4cplus/log4cplus.h>
-#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QToolButton>
 #include <QLabel>
 #include <QIcon>
 #include <QSize>
 
+#include "commons/definations.h"
 
-using namespace gump;
+
+namespace gump {
 
 
-MainToolBar::MainToolBar(QWidget *parent/* = nullptr*/)
-  : QToolBar(parent)
-{
+MainToolBar::MainToolBar(QWidget *parent)
+    : QToolBar(parent) {
   setMovable(false);
 
   QWidget *tool_bar = new QWidget(this);
@@ -55,13 +58,10 @@ MainToolBar::MainToolBar(QWidget *parent/* = nullptr*/)
   connect(details_btn, SIGNAL(released()), this, SLOT(OnDetails()));
 }
 
-MainToolBar::~MainToolBar()
-{
-
+MainToolBar::~MainToolBar() {
 }
 
-void MainToolBar::OnSearch()
-{
+void MainToolBar::OnSearch() {
   QStringList search_strs = search_edit_->text().split(" ");
   if (search_strs.empty()) return;
 
@@ -76,33 +76,31 @@ void MainToolBar::OnSearch()
     } else if (str.startsWith("stream:", Qt::CaseInsensitive)) {
       stream = str.section(":", 1).toStdString();
     } else {
-      LOG4CPLUS_WARN_FMT(LOGGER_NAME, "Cannot parse search string: %s",
+      LOG4CPLUS_WARN_FMT(kLoggerName, "Cannot parse search string: %s",
                          str.toStdString().c_str());
     }
   }
 
-  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Search vid: [%s] cname: [%s] stream: [%s]",
+  LOG4CPLUS_INFO_FMT(kLoggerName, "Search vid: [%s] cname: [%s] stream: [%s]",
                      vid.c_str(), cname.c_str(), stream.c_str());
   emit SearchItem(vid, cname, stream);
 }
 
-void MainToolBar::OnPlay()
-{
+void MainToolBar::OnPlay() {
   emit PlayStream();
 }
 
-void MainToolBar::OnPause()
-{
+void MainToolBar::OnPause() {
   emit PauseStream();
 }
 
-void MainToolBar::OnStop()
-{
+void MainToolBar::OnStop() {
   emit StopStream();
 }
 
-void MainToolBar::OnDetails()
-{
+void MainToolBar::OnDetails() {
   emit ShowDetails();
 }
 
+
+}  // namespace gump

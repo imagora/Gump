@@ -1,26 +1,32 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
+
 #include <log4cplus/appender.h>
+#include "view/log_dock.h"
 
 
 namespace gump {
 
-class LogDock;
 
-class LogDockAppender : public log4cplus::Appender
-{
+class LogDockAppender :
+    public log4cplus::Appender {
  public:
-  LogDockAppender(LogDock *log_widget);
+  explicit LogDockAppender(LogDock *log_widget);
 
   virtual ~LogDockAppender();
 
-  virtual void close();
+  virtual void close() override;
 
  protected:
-  virtual void append(const log4cplus::spi::InternalLoggingEvent& event);
+  virtual void append(
+      const log4cplus::spi::InternalLoggingEvent& event) override;
 
  private:
   LogDock *log_widget_;
 };
 
-}
+}  // namespace gump
 

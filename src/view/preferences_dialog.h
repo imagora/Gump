@@ -1,23 +1,25 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
 #include <QDialog>
-
-
-class QLineEdit;
-class QSettings;
-class QGridLayout;
+#include <QLineEdit>
+#include <QSettings>
+#include <QTextEdit>
+#include <QGridLayout>
 
 
 namespace gump {
 
 
-class PreferencesDialog : public QDialog
-{
+class PreferencesDialog : public QDialog {
   Q_OBJECT
 
  public:
-  PreferencesDialog(QWidget *parent = nullptr);
+  explicit PreferencesDialog(QWidget *parent = nullptr);
 
-  ~PreferencesDialog();
+  virtual ~PreferencesDialog();
 
  signals:
   void UpdatePreferences();
@@ -27,15 +29,15 @@ class PreferencesDialog : public QDialog
   void OnCancel();
 
  private:
-  QLineEdit *online_url_input_;
   QLineEdit *external_player_input_;
-  QLineEdit *rule_url_input_;
-  QLineEdit *rule_username_input_;
-  QLineEdit *rule_password_input_;
-  QLineEdit *tracer_url_input_;
+  QLineEdit *vendor_id_input_;
+  QLineEdit *max_load_input_;
+  QLineEdit *config_url_input_;
+  QLineEdit *config_username_input_;
+  QLineEdit *config_password_input_;
   QGridLayout *layout_;
   QSettings *settings_;
 };
 
 
-}
+}  // namespace gump

@@ -1,44 +1,41 @@
-#pragma once
+// Copyright (c) 2014-2019 winking324
+//
+
+#pragma once  // NOLINT(build/header_guard)
+
 #include <map>
+#include <QMenu>
 #include <QMenuBar>
 
-
-class QMenu;
+#include "view/about_dialog.h"
+#include "view/preferences_dialog.h"
 
 
 namespace gump {
 
 
-class AboutDialog;
-class PreferencesDialog;
-
-
-enum MenuType {
-  MENU_SETTINGS   = 1,
-  MENU_WINDOW     = 2,
-  MENU_HELP       = 3,
-};
-
-
-class MainMenuBar : public QMenuBar
-{
+class MainMenuBar : public QMenuBar {
   Q_OBJECT
 
  public:
-  MainMenuBar(QWidget *parent = nullptr);
-  ~MainMenuBar();
+  explicit MainMenuBar(QWidget *parent = nullptr);
+
+  virtual ~MainMenuBar();
 
  private:
   void InitSettingsMenu();
+
   void InitWindowMenu();
+
   void InitHelpMenu();
 
  private slots:
   void OpenAboutDlg();
+
   void OpenPreferencesDlg();
 
  private:
-  std::map<uint32_t, QMenu*>   menus_;
+  std::map<uint32_t, QMenu*> menus_;
   AboutDialog *about_dlg_;
   PreferencesDialog *preferences_dlg_;
 };

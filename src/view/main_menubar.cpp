@@ -1,25 +1,32 @@
-#include "main_menubar.h"
-#include "about_dialog.h"
-#include "preferences_dialog.h"
-#include "main_window.h"
-#include <QMenu>
+// Copyright (c) 2014-2019 winking324
+//
+
+#include "view/main_menubar.h"
+#include "view/main_window.h"
 
 
-using namespace gump;
+namespace gump {
 
 
-static const std::map<uint32_t, QString> MENU_NAME {
-  {MENU_SETTINGS, "Settings"},
-  {MENU_WINDOW, "Window"},
-  {MENU_HELP, "Help"},
+enum MenuType {
+  kMenuSettings = 1,
+  kMenuWindow = 2,
+  kMenuHelp = 3,
 };
 
 
-MainMenuBar::MainMenuBar(QWidget *parent/* = nullptr*/)
-  : QMenuBar(parent)
-{
-  for (auto &menuInfo : MENU_NAME) {
-    menus_.insert(std::make_pair(menuInfo.first, new QMenu(menuInfo.second, this)));
+static const std::map<uint32_t, QString> kMenuName {
+  {kMenuSettings, "Settings"},
+  {kMenuWindow, "Window"},
+  {kMenuHelp, "Help"},
+};
+
+
+MainMenuBar::MainMenuBar(QWidget *parent)
+    : QMenuBar(parent) {
+  for (auto &menu_info : kMenuName) {
+    menus_.insert(std::make_pair(menu_info.first,
+                                 new QMenu(menu_info.second, this)));
   }
 
   InitSettingsMenu();
@@ -31,45 +38,37 @@ MainMenuBar::MainMenuBar(QWidget *parent/* = nullptr*/)
   }
 }
 
-
-MainMenuBar::~MainMenuBar()
-{
-
+MainMenuBar::~MainMenuBar() {
 }
 
-
-void MainMenuBar::InitSettingsMenu()
-{
-  QMenu *settingsMenu = menus_[MENU_SETTINGS];
+void MainMenuBar::InitSettingsMenu() {
+  QMenu *settingsMenu = menus_[kMenuSettings];
   settingsMenu->addAction("preferences", this, SLOT(OpenPreferencesDlg()));
 }
 
-
-void MainMenuBar::InitWindowMenu()
-{
-  QMenu *windowMenu = menus_[MENU_WINDOW];
+void MainMenuBar::InitWindowMenu() {
+  QMenu *windowMenu = menus_[kMenuWindow];
   windowMenu->addAction("Minimize", this, SLOT(showMinimized()));
 }
 
-
-void MainMenuBar::InitHelpMenu()
-{
-  QMenu *helpMenu = menus_[MENU_HELP];
+void MainMenuBar::InitHelpMenu() {
+  QMenu *helpMenu = menus_[kMenuHelp];
   helpMenu->addAction("Help", this, SLOT(OpenAboutDlg()));
   helpMenu->addAction("About", this, SLOT(OpenAboutDlg()));
 }
 
-void MainMenuBar::OpenAboutDlg()
-{
+void MainMenuBar::OpenAboutDlg() {
   about_dlg_ = new AboutDialog(this);
   about_dlg_->show();
 }
 
-void MainMenuBar::OpenPreferencesDlg()
-{
+void MainMenuBar::OpenPreferencesDlg() {
   preferences_dlg_ = new PreferencesDialog(this);
   connect(preferences_dlg_, SIGNAL(UpdatePreferences()),
-          dynamic_cast<MainWindow *>(parentWidget()), SLOT(UpdatePreferences()));
+          dynamic_cast<MainWindow *>(parentWidget()),
+          SLOT(UpdatePreferences()));
   preferences_dlg_->show();
 }
 
+
+}  // namespace gump

@@ -1,19 +1,23 @@
-#pragma once
-#include <QtWidgets/QDockWidget>
+// Copyright (c) 2014-2019 winking324
+//
 
+#pragma once  // NOLINT(build/header_guard)
 
-class QTextEdit;
-class QTextCursor;
+#include <QString>
+#include <QTextEdit>
+#include <QDockWidget>
+#include <QTextCursor>
 
 
 namespace gump {
 
 
-class LogDock : public QDockWidget {
+class LogDock :
+    public QDockWidget {
  public:
-  LogDock(QWidget *parent = nullptr);
+  explicit LogDock(QWidget *parent = nullptr);
 
-  ~LogDock();
+  virtual ~LogDock();
 
   void InsertLog(const QString &log_info, int log_level);
 
@@ -37,5 +41,5 @@ class LogDock : public QDockWidget {
 };
 
 
-}
+}  // namespace gump
 

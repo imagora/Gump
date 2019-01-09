@@ -1,13 +1,14 @@
-#include "log_dock.h"
+// Copyright (c) 2014-2019 winking324
+//
+
+#include "view/log_dock.h"
 #include "commons/definations.h"
-#include <QTextEdit>
-#include <QTextCursor>
 
 
-using namespace gump;
+namespace gump {
 
 
-void (LogDock::* g_logFormatFunc[LOG_LEVEL_BUTT])(QTextCursor*) = {
+void (LogDock::*kLogFormatHandler[kLogButt])(QTextCursor*) = {
     &LogDock::TraceLogFormat,
     &LogDock::DebugLogFormat,
     &LogDock::InfoLogFormat,
@@ -31,7 +32,7 @@ LogDock::~LogDock() {
 void LogDock::InsertLog(const QString &log_info, int log_level) {
   log_text_edit_->moveCursor(QTextCursor::End);
   QTextCursor text_cursor(log_text_edit_->textCursor());
-  (this->*g_logFormatFunc[log_level])(&text_cursor);
+  (this->*kLogFormatHandler[log_level])(&text_cursor);
   text_cursor.insertText(log_info);
 }
 
@@ -64,3 +65,7 @@ void LogDock::LogColorFormat(QTextCursor *text_cursor, Qt::GlobalColor color) {
   format.setForeground(QBrush(color));
   text_cursor->setCharFormat(format);
 }
+
+
+}  // namespace gump
+

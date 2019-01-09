@@ -1,10 +1,11 @@
-#include "main_central_widget.h"
-#include "player_widget.h"
-#include "controller/stream_manager.h"
+// Copyright (c) 2014-2019 winking324
+//
+
+#include "view/main_central_widget.h"
+
 #include <log4cplus/log4cplus.h>
-#include <QTableWidgetItem>
+
 #include <QDesktopServices>
-#include <QTableWidget>
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -14,16 +15,16 @@
 #include <QKeyEvent>
 #include <QRegExp>
 #include <QMenu>
+
 #include <map>
 
 
-using namespace gump;
+namespace gump {
 
 
 MainCentralWidget::MainCentralWidget(QWidget *parent)
-  : QWidget(parent)
-{
-  stream_mgr_ = new StreamManager(this);
+    : QWidget(parent) {
+  config_mgr_ = new PreferencesManager(this);
 
   QHBoxLayout *all_layout = new QHBoxLayout();
   setLayout(all_layout);
@@ -34,33 +35,39 @@ MainCentralWidget::MainCentralWidget(QWidget *parent)
   stream_table_ = new QTableWidget(this);
   stream_table_->setContextMenuPolicy(Qt::CustomContextMenu);
   stream_table_->setColumnCount(3);
-  stream_table_->setHorizontalHeaderLabels(QStringList{"VID", "CNAME", "STREAM"});
-  stream_table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-  stream_table_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+  stream_table_->setHorizontalHeaderLabels(
+        QStringList{"VID", "CNAME", "STREAM"});
+  stream_table_->horizontalHeader()->setSectionResizeMode(
+        0, QHeaderView::ResizeToContents);
+  stream_table_->horizontalHeader()->setSectionResizeMode(
+        2, QHeaderView::Stretch);
   table_layout->addWidget(stream_table_);
 
   player_widget_ = new PlayerWidget(this);
   all_layout->addWidget(player_widget_);
 
-  connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(OnPlay(QTableWidgetItem*)));
-  connect(stream_table_, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(OnMenu(QPoint)));
-  connect(stream_mgr_, SIGNAL(Refresh(ChannelStreams)), this, SLOT(RefreshStreams(ChannelStreams)));
+  connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this,
+          SLOT(OnPlay(QTableWidgetItem*)));
+  connect(stream_table_, SIGNAL(customContextMenuRequested(QPoint)), this,
+          SLOT(OnMenu(QPoint)));
+  connect(config_mgr_, SIGNAL(Refresh(ChannelStreams)), this,
+          SLOT(RefreshStreams(ChannelStreams)));
 }
 
-MainCentralWidget::~MainCentralWidget()
-{
+MainCentralWidget::~MainCentralWidget() {
 }
 
-void MainCentralWidget::UpdateStreamRule()
-{
-  stream_mgr_->UpdateStreamRule();
+void MainCentralWidget::UpdatePreferences() {
+  config_mgr_->UpdatePreferences();
 }
 
-void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cname, const std::string &stream)
-{
+void MainCentralWidget::SearchItem(const std::string &vid,
+                                   const std::string &cname,
+                                   const std::string &stream) {
   int selected_row = 0;
   if (!vid.empty()) {
-    QList<QTableWidgetItem *> find_items = stream_table_->findItems(vid.c_str(), Qt::MatchExactly);
+    QList<QTableWidgetItem *> find_items =
+        stream_table_->findItems(vid.c_str(), Qt::MatchExactly);
     if (find_items.empty()) return;
 
     int row = (*find_items.begin())->row();
@@ -72,7 +79,8 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
     foreach (QTableWidgetItem *item, find_items) {
       row = item->row();
       if (!cname.empty() &&
-          !stream_table_->item(row, 1)->text().contains(cname.c_str(), Qt::CaseInsensitive)) {
+          !stream_table_->item(row, 1)->text().contains(
+            cname.c_str(), Qt::CaseInsensitive)) {
         continue;
       }
 
@@ -85,7 +93,8 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
         selected_row = row;
       }
 
-      if (!stream_table_->item(row, 2)->text().contains(stream.c_str(), Qt::CaseInsensitive)) {
+      if (!stream_table_->item(row, 2)->text().contains(
+            stream.c_str(), Qt::CaseInsensitive)) {
         continue;
       }
 
@@ -98,7 +107,8 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
   }
 
   if (!cname.empty()) {
-    QList<QTableWidgetItem *> find_items = stream_table_->findItems(cname.c_str(), Qt::MatchContains);
+    QList<QTableWidgetItem *> find_items =
+        stream_table_->findItems(cname.c_str(), Qt::MatchContains);
     if (find_items.empty()) return;
 
     int row = (*find_items.begin())->row();
@@ -118,7 +128,8 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
         selected_row = row;
       }
 
-      if (!stream_table_->item(row, 2)->text().contains(stream.c_str(), Qt::CaseInsensitive)) {
+      if (!stream_table_->item(row, 2)->text().contains(
+            stream.c_str(), Qt::CaseInsensitive)) {
         continue;
       }
 
@@ -131,7 +142,8 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
   }
 
   if (!stream.empty()) {
-    QList<QTableWidgetItem *> find_items = stream_table_->findItems(cname.c_str(), Qt::MatchContains);
+    QList<QTableWidgetItem *> find_items =
+        stream_table_->findItems(cname.c_str(), Qt::MatchContains);
     if (find_items.empty()) return;
 
     int row = (*find_items.begin())->row();
@@ -139,34 +151,29 @@ void MainCentralWidget::SearchItem(const std::string &vid, const std::string &cn
   }
 }
 
-void MainCentralWidget::PlayStream()
-{
+void MainCentralWidget::PlayStream() {
   player_widget_->PlayStream("");
 }
 
-void MainCentralWidget::PauseStream()
-{
+void MainCentralWidget::PauseStream() {
   player_widget_->PauseStream();
 }
 
-void MainCentralWidget::StopStream()
-{
+void MainCentralWidget::StopStream() {
   player_widget_->StopStream();
 }
 
-void MainCentralWidget::ShowDetails()
-{
+void MainCentralWidget::ShowDetails() {
   player_widget_->ShowDetails();
 }
 
-void MainCentralWidget::WindowMove()
-{
+void MainCentralWidget::WindowMove() {
   player_widget_->WindowMove();
 }
 
-void MainCentralWidget::keyReleaseEvent(QKeyEvent *event)
-{
-  if (event->key() != Qt::Key_Up && event->key() != Qt::Key_Down) {
+void MainCentralWidget::keyReleaseEvent(QKeyEvent *event) {
+  if (event->key() != Qt::Key_Up &&
+      event->key() != Qt::Key_Down) {
     return;
   }
 
@@ -178,30 +185,34 @@ void MainCentralWidget::keyReleaseEvent(QKeyEvent *event)
   OnPlay(item);
 }
 
-void MainCentralWidget::InsertRow(const std::string &vid, const std::string &cname, const StreamInfo &stream)
-{
+void MainCentralWidget::InsertRow(const std::string &vid,
+                                  const std::string &cname,
+                                  const StreamInfo &stream) {
   stream_table_->insertRow(stream_table_->rowCount());
   int row = stream_table_->rowCount() - 1;
   QTableWidgetItem *vid_item = new QTableWidgetItem(vid.c_str());
   QTableWidgetItem *cname_item = new QTableWidgetItem(cname.c_str());
-  QTableWidgetItem *stream_item = new QTableWidgetItem(stream.stream_url.c_str());
+  QTableWidgetItem *stream_item =
+      new QTableWidgetItem(stream.stream_url.c_str());
 
   vid_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
   cname_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
   stream_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
 
   cname_item->setToolTip(cname.c_str());
-  stream_item->setToolTip(stream_mgr_->ConvertToToolTip(stream).c_str());
+  stream_item->setToolTip(config_mgr_->ConvertToToolTip(stream).c_str());
 
   stream_table_->setItem(row, 0, vid_item);
   stream_table_->setItem(row, 1, cname_item);
   stream_table_->setItem(row, 2, stream_item);
 }
 
-void MainCentralWidget::RemoveRow(const std::string &vid, const std::string &cname, const std::string &stream)
-{
+void MainCentralWidget::RemoveRow(const std::string &vid,
+                                  const std::string &cname,
+                                  const std::string &stream) {
   if (stream.empty()) {
-    QList<QTableWidgetItem *> find_items = stream_table_->findItems(cname.c_str(), Qt::MatchExactly);
+    QList<QTableWidgetItem *> find_items =
+        stream_table_->findItems(cname.c_str(), Qt::MatchExactly);
     foreach (QTableWidgetItem *item, find_items) {
       int row = item->row();
       if (stream_table_->item(row, 0)->text().toStdString() != vid) continue;
@@ -210,7 +221,8 @@ void MainCentralWidget::RemoveRow(const std::string &vid, const std::string &cna
     return;
   }
 
-  QList<QTableWidgetItem *> find_items = stream_table_->findItems(stream.c_str(), Qt::MatchExactly);
+  QList<QTableWidgetItem *> find_items =
+      stream_table_->findItems(stream.c_str(), Qt::MatchExactly);
   foreach (QTableWidgetItem *item, find_items) {
     int row = item->row();
     if (stream_table_->item(row, 0)->text().toStdString() != vid) continue;
@@ -219,8 +231,8 @@ void MainCentralWidget::RemoveRow(const std::string &vid, const std::string &cna
   }
 }
 
-void MainCentralWidget::DiffChannelStreams(const ChannelStreams &channel_streams)
-{
+void MainCentralWidget::DiffChannelStreams(
+    const ChannelStreams &channel_streams) {
   // 1. check channel quit/change
   for (auto channel : channel_streams_) {
     auto iter = channel_streams.find(channel.first);
@@ -262,20 +274,19 @@ void MainCentralWidget::DiffChannelStreams(const ChannelStreams &channel_streams
   }
 }
 
-void MainCentralWidget::OnPlay(QTableWidgetItem *item)
-{
+void MainCentralWidget::OnPlay(QTableWidgetItem *item) {
   std::string cmd;
   std::string stream = item->text().toStdString();
   if (stream.empty() || stream.find("rtmp") == std::string::npos) {
     return;
   }
-  stream = stream_mgr_->ConvertToPlayUrl(stream);
+  stream = config_mgr_->ConvertToPlayUrl(stream);
   if (stream.empty()) {
-    LOG4CPLUS_WARN_STR(LOGGER_NAME, "Cannot convert stream to play url");
+    LOG4CPLUS_WARN_STR(kLoggerName, "Cannot convert stream to play url");
     return;
   }
 
-  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Play stream: %s", stream.c_str());
+  LOG4CPLUS_INFO_FMT(kLoggerName, "Play stream: %s", stream.c_str());
   player_widget_->StopStream();
   player_widget_->PlayStream(stream);
 
@@ -290,65 +301,60 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item)
 
   cmd += stream;
 
-  LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Run cmd: %s", cmd.c_str());
-  stream_mgr_->PlayStream(cmd);
+  LOG4CPLUS_INFO_FMT(kLoggerName, "Run cmd: %s", cmd.c_str());
+  config_mgr_->PlayStream(cmd);
 }
 
-void MainCentralWidget::OnPlay(bool)
-{
+void MainCentralWidget::OnPlay(bool) {
   int row = stream_table_->currentRow();
   QTableWidgetItem *item = stream_table_->item(row, 2);
   OnPlay(item);
 }
 
-void MainCentralWidget::OnTracer(bool)
-{
+void MainCentralWidget::OnTracer(bool) {
+  QString url = QString::fromStdString(config_mgr_->QueryConfig("tracer_url"));
+  if (url.isEmpty()) return;
+
   int row = stream_table_->currentRow();
   QTableWidgetItem *vid_item = stream_table_->item(row, 0);
   QString vid = vid_item->text();
   QTableWidgetItem *cname_item = stream_table_->item(row, 1);
   QString cname = cname_item->text();
-  QSettings settings("agora.io", "gump");
-  settings.beginGroup("preferences");
-  QString url = settings.value("tracer_url").toString();
-  settings.endGroup();
-  url += ("?vid=" + vid + "&querystring=cname:" + cname);
+
+  url += ("?vids=" + vid + "&cname=" + cname);
   QDesktopServices::openUrl(QUrl(url));
 }
 
-void MainCentralWidget::OnCopyStream(bool)
-{
+void MainCentralWidget::OnCopyStream(bool) {
   int row = stream_table_->currentRow();
   QTableWidgetItem *item = stream_table_->item(row, 2);
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(item->text());
 }
 
-void MainCentralWidget::OnCopyPlayStream(bool)
-{
+void MainCentralWidget::OnCopyPlayStream(bool) {
   int row = stream_table_->currentRow();
   QTableWidgetItem *item = stream_table_->item(row, 2);
   std::string stream = item->text().toStdString();
   if (stream.empty() || stream.find("rtmp") == std::string::npos) {
-    LOG4CPLUS_INFO_FMT(LOGGER_NAME, "Copy play stream %s failed", stream.c_str());
+    LOG4CPLUS_INFO_FMT(kLoggerName, "Copy play stream %s failed",
+                       stream.c_str());
     return;
   }
 
-  stream = stream_mgr_->ConvertToPlayUrl(stream);
+  stream = config_mgr_->ConvertToPlayUrl(stream);
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(stream.c_str());
 }
 
-void MainCentralWidget::OnCopyStreamInfo(bool)
-{
+void MainCentralWidget::OnCopyStreamInfo(bool) {
   int row = stream_table_->currentRow();
   QTableWidgetItem *item = stream_table_->item(row, 2);
   QClipboard *clipboard = QApplication::clipboard();
   clipboard->setText(item->toolTip());
 }
 
-void MainCentralWidget::OnMenu(const QPoint &pos)
-{
+void MainCentralWidget::OnMenu(const QPoint &pos) {
   QMenu *menu = new QMenu(this);
 
   QAction *play_action = new QAction("Play Stream", menu);
@@ -360,7 +366,8 @@ void MainCentralWidget::OnMenu(const QPoint &pos)
   connect(play_action, SIGNAL(triggered(bool)), SLOT(OnPlay(bool)));
   connect(open_tracer_action, SIGNAL(triggered(bool)), SLOT(OnTracer(bool)));
   connect(url_action, SIGNAL(triggered(bool)), SLOT(OnCopyStream(bool)));
-  connect(play_url_action, SIGNAL(triggered(bool)), SLOT(OnCopyPlayStream(bool)));
+  connect(play_url_action, SIGNAL(triggered(bool)),
+          SLOT(OnCopyPlayStream(bool)));
   connect(info_action, SIGNAL(triggered(bool)), SLOT(OnCopyStreamInfo(bool)));
 
   menu->addAction(play_action);
@@ -372,8 +379,11 @@ void MainCentralWidget::OnMenu(const QPoint &pos)
   menu->popup(stream_table_->viewport()->mapToGlobal(pos));
 }
 
-void MainCentralWidget::RefreshStreams(ChannelStreams channel_streams)
-{
+void MainCentralWidget::RefreshStreams(ChannelStreams channel_streams) {
   DiffChannelStreams(channel_streams);
   channel_streams_.swap(channel_streams);
 }
+
+
+}  // namespace gump
+
