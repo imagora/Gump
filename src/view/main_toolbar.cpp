@@ -62,28 +62,7 @@ MainToolBar::~MainToolBar() {
 }
 
 void MainToolBar::OnSearch() {
-  QStringList search_strs = search_edit_->text().split(" ");
-  if (search_strs.empty()) return;
-
-  std::string vid;
-  std::string cname;
-  std::string stream;
-  foreach (const QString &str, search_strs) {
-    if (str.startsWith("vid:", Qt::CaseInsensitive)) {
-      vid = str.section(":", 1).toStdString();
-    } else if (str.startsWith("cname:", Qt::CaseInsensitive)) {
-      cname = str.section(":", 1).toStdString();
-    } else if (str.startsWith("stream:", Qt::CaseInsensitive)) {
-      stream = str.section(":", 1).toStdString();
-    } else {
-      LOG4CPLUS_WARN_FMT(kLoggerName, "Cannot parse search string: %s",
-                         str.toStdString().c_str());
-    }
-  }
-
-  LOG4CPLUS_INFO_FMT(kLoggerName, "Search vid: [%s] cname: [%s] stream: [%s]",
-                     vid.c_str(), cname.c_str(), stream.c_str());
-  emit SearchItem(vid, cname, stream);
+  emit SearchItem(search_edit_->text().toStdString());
 }
 
 void MainToolBar::OnPlay() {

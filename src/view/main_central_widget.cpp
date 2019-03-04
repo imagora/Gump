@@ -61,94 +61,12 @@ void MainCentralWidget::UpdatePreferences() {
   config_mgr_->UpdatePreferences();
 }
 
-void MainCentralWidget::SearchItem(const std::string &vid,
-                                   const std::string &cname,
-                                   const std::string &stream) {
-  int selected_row = 0;
-  if (!vid.empty()) {
-    QList<QTableWidgetItem *> find_items =
-        stream_table_->findItems(vid.c_str(), Qt::MatchExactly);
-    if (find_items.empty()) return;
+void MainCentralWidget::SearchItem(const std::string &search) {
+  QList<QTableWidgetItem *> find_items =
+      stream_table_->findItems(search.c_str(), Qt::MatchContains);
+  if (find_items.empty()) return;
 
-    int row = (*find_items.begin())->row();
-    if (cname.empty() && stream.empty()) {
-      stream_table_->selectRow(row);
-      return;
-    }
-
-    foreach (QTableWidgetItem *item, find_items) {
-      row = item->row();
-      if (!cname.empty() &&
-          !stream_table_->item(row, 1)->text().contains(
-            cname.c_str(), Qt::CaseInsensitive)) {
-        continue;
-      }
-
-      if (stream.empty()) {
-        stream_table_->selectRow(row);
-        return;
-      }
-
-      if (selected_row == 0) {
-        selected_row = row;
-      }
-
-      if (!stream_table_->item(row, 2)->text().contains(
-            stream.c_str(), Qt::CaseInsensitive)) {
-        continue;
-      }
-
-      stream_table_->selectRow(row);
-      return;
-    }
-
-    stream_table_->selectRow(selected_row == 0 ? row : selected_row);
-    return;
-  }
-
-  if (!cname.empty()) {
-    QList<QTableWidgetItem *> find_items =
-        stream_table_->findItems(cname.c_str(), Qt::MatchContains);
-    if (find_items.empty()) return;
-
-    int row = (*find_items.begin())->row();
-    if (stream.empty()) {
-      stream_table_->selectRow(row);
-      return;
-    }
-
-    foreach (QTableWidgetItem *item, find_items) {
-      row = item->row();
-      if (stream.empty()) {
-        stream_table_->selectRow(row);
-        return;
-      }
-
-      if (selected_row == 0) {
-        selected_row = row;
-      }
-
-      if (!stream_table_->item(row, 2)->text().contains(
-            stream.c_str(), Qt::CaseInsensitive)) {
-        continue;
-      }
-
-      stream_table_->selectRow(row);
-      return;
-    }
-
-    stream_table_->selectRow(selected_row == 0 ? row : selected_row);
-    return;
-  }
-
-  if (!stream.empty()) {
-    QList<QTableWidgetItem *> find_items =
-        stream_table_->findItems(cname.c_str(), Qt::MatchContains);
-    if (find_items.empty()) return;
-
-    int row = (*find_items.begin())->row();
-    stream_table_->selectRow(row);
-  }
+  stream_table_->selectRow((*find_items.begin())->row());
 }
 
 void MainCentralWidget::PlayStream() {

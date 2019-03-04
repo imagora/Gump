@@ -22,7 +22,7 @@ class MainToolBar :
   virtual ~MainToolBar();
 
  signals:
-  void SearchItem(std::string vid, std::string cname, std::string stream);
+  void SearchItem(std::string search);
 
   void PlayStream();
 

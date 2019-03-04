@@ -30,8 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
   log4cplus::Logger::getInstance(kLoggerName).addAppender(log_appender_);
 
   setWindowState(Qt::WindowMaximized);
-  connect(toolbar_, SIGNAL(SearchItem(std::string,std::string,std::string)),
-          this, SLOT(SearchItem(std::string,std::string,std::string)));
+  connect(toolbar_, SIGNAL(SearchItem(std::string)), this,
+          SLOT(SearchItem(std::string)));
   connect(toolbar_, SIGNAL(PlayStream()), this, SLOT(PlayStream()));
   connect(toolbar_, SIGNAL(PauseStream()), this, SLOT(PauseStream()));
   connect(toolbar_, SIGNAL(StopStream()), this, SLOT(StopStream()));
@@ -46,9 +46,8 @@ void MainWindow::UpdatePreferences() {
   central_widget_->UpdatePreferences();
 }
 
-void MainWindow::SearchItem(std::string vid, std::string cname,
-                            std::string stream) {
-  central_widget_->SearchItem(vid, cname, stream);
+void MainWindow::SearchItem(std::string search) {
+  central_widget_->SearchItem(search);
 }
 
 void MainWindow::PlayStream() {

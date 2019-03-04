@@ -30,8 +30,7 @@ class MainCentralWidget :
   void UpdatePreferences();
 
  public slots:
-  void SearchItem(const std::string &vid, const std::string &cname,
-                  const std::string &stream);
+  void SearchItem(const std::string &search);
 
   void PlayStream();
 
