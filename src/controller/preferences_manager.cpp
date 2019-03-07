@@ -125,6 +125,8 @@ void PreferencesManager::UpdatePreferences() {
   QNetworkRequest request = QNetworkRequest(QUrl(config_url));
   request.setRawHeader("Authorization", headerData.toLocal8Bit());
   config_mgr_->get(request);
+
+  RefreshChannelStreams();
 }
 
 void PreferencesManager::RefreshChannelStreams() {
