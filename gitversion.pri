@@ -135,5 +135,11 @@ BUILD_VERSION_INFO = $$VER_MAJOR $$VER_MINOR $$VER_PATCH $$VER_REVISION_STR $$VE
 # Now we are ready to pass parsed version to Qt ===
 VERSION = $$VER_MAJOR"."$$VER_MINOR"."$$VER_PATCH
 
+DEFINES += BUILD_VERSION=\\\"$$VERSION\\\"
+macx {
+    INFO_PLIST_PATH = $$shell_quote($${OUT_PWD}/$${TARGET}.app/Contents/Info.plist)
+    QMAKE_POST_LINK += /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $${VERSION}\" $${INFO_PLIST_PATH}
+}
+
 # Display the complete version string
 message(~~~ BUILD_VERSION_INFO: $$BUILD_VERSION_INFO ~~~)

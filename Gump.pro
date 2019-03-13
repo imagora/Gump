@@ -15,7 +15,6 @@ INCLUDEPATH += src
 INCLUDEPATH += /usr/local/include
 LIBS += -L/usr/lib -L/usr/local/lib -llog4cplus
 DEFINES += QT_DEPRECATED_WARNINGS
-DEFINES += BUILD_VERSION=\\\"$$VERSION\\\"
 
 #---------------------------------------------------------------------
 # PART 3: Clean
@@ -37,7 +36,7 @@ SOURCES += \
     src/controller/preferences_manager.cpp \
     src/view/application.cpp \
     src/controller/search_event.cpp
-HEADERS  += \
+HEADERS += \
     src/view/main_window.h \
     src/view/about_dialog.h \
     src/view/main_menubar.h \
@@ -54,7 +53,7 @@ HEADERS  += \
 RESOURCES += \
     resource.qrc
 
-mac {
+macx {
     # Info.plist
     QMAKE_INFO_PLIST = Info.plist
 
