@@ -7,8 +7,8 @@
 #include <QtGlobal>
 #include <QApplication>
 
-
 #include "view/main_window.h"
+#include "view/application.h"
 #include "commons/definations.h"
 
 
@@ -47,13 +47,15 @@ void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
 
 int main(int argc, char *argv[]) {
   QtAV::Widgets::registerRenderers();
-  QApplication a(argc, argv);
+  gump::Application a(argc, argv);
   a.setWindowIcon(QIcon(":/icon.png"));
   QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
   gump::MainWindow w;
+  a.SetEventReceiver(&w);
   w.show();
 
   qInstallMessageHandler(QMessageOutput);
   return a.exec();
 }
+

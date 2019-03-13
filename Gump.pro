@@ -34,7 +34,9 @@ SOURCES += \
     src/view/log_dock.cpp \
     src/controller/log_dock_appender.cpp \
     src/view/player_widget.cpp \
-    src/controller/preferences_manager.cpp
+    src/controller/preferences_manager.cpp \
+    src/view/application.cpp \
+    src/controller/search_event.cpp
 HEADERS  += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -46,7 +48,16 @@ HEADERS  += \
     src/view/log_dock.h \
     src/controller/log_dock_appender.h \
     src/view/player_widget.h \
-    src/controller/preferences_manager.h
+    src/controller/preferences_manager.h \
+    src/view/application.h \
+    src/controller/search_event.h
 RESOURCES += \
     resource.qrc
-ICON = icon.icns
+
+mac {
+    # Info.plist
+    QMAKE_INFO_PLIST = Info.plist
+
+    # Icon
+    ICON = icon.icns
+}

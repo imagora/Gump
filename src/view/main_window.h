@@ -37,6 +37,8 @@ class MainWindow : public QMainWindow {
   void ShowDetails();
 
  protected:
+  virtual bool event(QEvent *event) override;
+
   virtual void closeEvent(QCloseEvent *event) override;
 
   virtual void moveEvent(QMoveEvent *event) override;

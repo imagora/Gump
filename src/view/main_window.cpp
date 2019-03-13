@@ -6,6 +6,9 @@
 #include <log4cplus/log4cplus.h>
 
 #include <QIcon>
+#include <QFileOpenEvent>
+
+#include "controller/search_event.h"
 
 
 namespace gump {
@@ -64,6 +67,16 @@ void MainWindow::StopStream() {
 
 void MainWindow::ShowDetails() {
   central_widget_->ShowDetails();
+}
+
+bool MainWindow::event(QEvent *event) {
+  if (event->type() == kSearchEventType) {
+    SearchEvent *search_event = dynamic_cast<SearchEvent *>(event);
+    SearchItem(search_event->GetSearchInfo().toStdString());
+    return true;
+  }
+
+  return QMainWindow::event(event);
 }
 
 void MainWindow::closeEvent(QCloseEvent *) {

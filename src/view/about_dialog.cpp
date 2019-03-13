@@ -1,11 +1,15 @@
+// Copyright (c) 2014-2019 winking324
+//
+#include "about_dialog.h"
+
 #include <QIcon>
 #include <QLabel>
 #include <QGridLayout>
-#include "about_dialog.h"
+
 #include "commons/definations.h"
 
 
-using namespace gump;
+namespace gump {
 
 
 AboutDialog::AboutDialog(QWidget *parent/* = nullptr*/)
@@ -39,8 +43,4 @@ AboutDialog::AboutDialog(QWidget *parent/* = nullptr*/)
 }
 
 
-AboutDialog::~AboutDialog()
-{
-
-}
-
+}  // namespace gump
