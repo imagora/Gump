@@ -59,6 +59,8 @@ PlayerWidget::PlayerWidget(QWidget *parent)
   }
 
   player_ = new QtAV::AVPlayer(this);
+  buffered_player_ = new QtAV::AVPlayer(this);
+
   player_->addVideoRenderer(video_output_);
   player_status_ = new QLabel(PlayerStatus(), this);
   QPalette pe;
@@ -78,6 +80,9 @@ PlayerWidget::PlayerWidget(QWidget *parent)
           SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
   connect(player_, SIGNAL(error(QtAV::AVError)), this,
           SLOT(OnPlayerError(QtAV::AVError)));
+  connect(buffered_player_, SIGNAL(error(QtAV::AVError)), this,
+          SLOT(OnPlayerError(QtAV::AVError)));
+
   QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
 }
 
@@ -91,8 +96,38 @@ void PlayerWidget::PlayStream(const std::string &stream) {
   }
 
   if (stream_ == stream) return;
+
+  if (stream == buffered_stream_) {
+    stream_ = buffered_stream_;
+    buffered_stream_.clear();
+
+    StopStream();
+    player_->clearVideoRenderers();
+
+    buffered_player_->addVideoRenderer(video_output_);
+    std::swap(player_, buffered_player_);
+
+    auto *audio = player_->audio();
+    audio->setMute(false);
+    return;
+  }
+
   player_->play(QString::fromStdString(stream));
   stream_ = stream;
+}
+
+void PlayerWidget::BufferStream(const std::string &stream) {
+  if (buffered_stream_ == stream) return;
+
+  if (buffered_player_->isPlaying()) {
+    buffered_player_->stop();
+  }
+
+  buffered_player_->play(QString::fromStdString(stream));
+  auto *audio = buffered_player_->audio();
+  audio->setMute();
+
+  buffered_stream_ = stream;
 }
 
 void PlayerWidget::StopStream() {

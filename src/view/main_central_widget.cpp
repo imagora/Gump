@@ -208,6 +208,20 @@ void MainCentralWidget::OnPlay(QTableWidgetItem *item) {
   player_widget_->StopStream();
   player_widget_->PlayStream(stream);
 
+  if (item->row() + 1 < stream_table_->rowCount()) {
+    auto *buffered_item = stream_table_->item(item->row() + 1, 2);
+    std::string buffer_stream = buffered_item->text().toStdString();
+    if (!buffer_stream.empty() &&
+        buffer_stream.find("rtmp") != std::string::npos) {
+      buffer_stream = config_mgr_->ConvertToPlayUrl(buffer_stream);
+    }
+
+    if (!buffer_stream.empty()) {
+      LOG4CPLUS_INFO(kLoggerName, "Buffer stream: " << buffer_stream);
+      player_widget_->BufferStream(buffer_stream);
+    }
+  }
+
   QSettings settings("agora.io", "gump");
   settings.beginGroup("preferences");
   cmd = settings.value("external_player").toString().toStdString();

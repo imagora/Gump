@@ -25,6 +25,8 @@ class PlayerWidget :
 
   void PlayStream(const std::string &stream);
 
+  void BufferStream(const std::string &stream);
+
   void StopStream();
 
   void StartStream();
@@ -51,8 +53,10 @@ class PlayerWidget :
   int current_screen_ratio_;
   QtAV::VideoOutput *video_output_;
   QtAV::AVPlayer *player_;
+  QtAV::AVPlayer *buffered_player_;
   QLabel *player_status_;
   std::string stream_;
+  std::string buffered_stream_;
 };
 
 
