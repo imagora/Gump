@@ -21,7 +21,6 @@ MainToolBar::MainToolBar(QWidget *parent)
   setMovable(false);
 
   QWidget *tool_bar = new QWidget(this);
-  tool_bar->setToolTip("vid:xxx cname:xxx stream:xxx");
   QHBoxLayout *tool_bar_layout = new QHBoxLayout(tool_bar);
 
   QLabel *search_label = new QLabel("Search:", tool_bar);
