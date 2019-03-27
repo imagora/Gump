@@ -70,7 +70,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
   stacked_layout->addWidget(player_status_);
   stacked_layout->addWidget(video_output_->widget());
-  setFixedWidth(300);
+//  setFixedWidth(30);
 
   main_layout->addLayout(stacked_layout);
   setLayout(main_layout);

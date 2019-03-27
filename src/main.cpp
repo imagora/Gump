@@ -9,6 +9,7 @@
 
 #include "view/main_window.h"
 #include "view/application.h"
+#include "view/gump_window.h"
 #include "commons/definations.h"
 
 
@@ -51,11 +52,15 @@ int main(int argc, char *argv[]) {
   a.setWindowIcon(QIcon(":/icon.png"));
   QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
+  gump::GumpWindow w;
+  w.show();
+  /*
   gump::MainWindow w;
   a.SetEventReceiver(&w);
   w.show();
 
   qInstallMessageHandler(QMessageOutput);
+  */
   return a.exec();
 }
 

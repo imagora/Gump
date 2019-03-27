@@ -2,9 +2,13 @@
     <qresource prefix="/">
         <file alias="icon.png">Resource/icon.png</file>
         <file alias="search.png">Resource/search.png</file>
+        <file alias="search_16px.png">Resource/search_16px.png</file>
         <file alias="play.png">Resource/play.png</file>
         <file alias="pause.png">Resource/pause.png</file>
         <file alias="stop.png">Resource/stop.png</file>
         <file alias="details.png">Resource/details.png</file>
+        <file alias="username.png">Resource/username.png</file>
+        <file alias="username2.png">Resource/username2.png</file>
+        <file alias="password.png">Resource/password.png</file>
     </qresource>
 </RCC>
