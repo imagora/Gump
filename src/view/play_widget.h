@@ -5,6 +5,7 @@
 
 
 #include <QWidget>
+#include "view/player_widget.h"
 
 
 namespace gump {
@@ -12,12 +13,15 @@ namespace gump {
 
 class PlayWidget : public QWidget {
   Q_OBJECT
-public:
+ public:
   explicit PlayWidget(QWidget *parent = nullptr);
 
-signals:
+ signals:
 
-public slots:
+ public slots:
+
+ private:
+  PlayerWidget *player_;
 };
 
 

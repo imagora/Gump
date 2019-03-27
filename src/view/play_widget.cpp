@@ -8,7 +8,8 @@ namespace gump {
 
 
 PlayWidget::PlayWidget(QWidget *parent) : QWidget(parent) {
-
+  player_ = new PlayerWidget(this);
+  player_->setFixedSize(QSize(360, 640));
 }
 
 

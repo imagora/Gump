@@ -36,7 +36,7 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent) {
                            "QPushButton:hover {color:white;} "
                            "QPushButton:pressed{color:white;background:gray;}");
 
-  error_label_ = new QLabel(this);
+  error_label_ = new QLabel("Error: timeout", this);
   error_label_->setStyleSheet("color:red;margin-top:40px;");
 
   auto *layout = new QGridLayout(this);

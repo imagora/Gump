@@ -11,7 +11,7 @@ enum class StackedWidgetIndex : int {
   kLogin = 0,
   kLogging = 1,
   kPlaylist = 2,
-  kPlayer = 3,
+  kPlay = 3,
   kConfig = 4,
 };
 
@@ -20,6 +20,7 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
   login_widget_ = new LoginWidget(this);
   logging_widget_ = new LoggingWidget(this);
   playlist_widget_ = new PlaylistWidget(this);
+  play_widget_ = new PlayWidget(this);
 
   stacked_layout_ = new QStackedLayout(this);
   stacked_layout_->insertWidget(
@@ -28,6 +29,8 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
         static_cast<int>(StackedWidgetIndex::kLogging), logging_widget_);
   stacked_layout_->insertWidget(
         static_cast<int>(StackedWidgetIndex::kPlaylist), playlist_widget_);
+  stacked_layout_->insertWidget(
+        static_cast<int>(StackedWidgetIndex::kPlay), play_widget_);
 
   setLayout(stacked_layout_);
 
@@ -37,7 +40,7 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
 void CentralWidget::OnLogin(QString username, QString password) {
   logging_widget_->SetUsername(username);
   stacked_layout_->setCurrentIndex(
-        static_cast<int>(StackedWidgetIndex::kPlaylist));
+        static_cast<int>(StackedWidgetIndex::kPlay));
 }
 
 

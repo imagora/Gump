@@ -9,6 +9,7 @@
 #include "view/login_widget.h"
 #include "view/logging_widget.h"
 #include "view/playlist_widget.h"
+#include "view/play_widget.h"
 
 
 namespace gump {
@@ -29,6 +30,7 @@ class CentralWidget :
   LoginWidget *login_widget_;
   LoggingWidget *logging_widget_;
   PlaylistWidget *playlist_widget_;
+  PlayWidget *play_widget_;
   QStackedLayout *stacked_layout_;
 };
 
