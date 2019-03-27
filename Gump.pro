@@ -6,8 +6,6 @@ TEMPLATE = app
 OBJECTS_DIR = .objs
 QT += core gui network avwidgets
 
-include(gitversion.pri)
-
 #---------------------------------------------------------------------
 # PART 2: target, library, flags
 TARGET = bin/Gump
@@ -22,6 +20,16 @@ QMAKE_CLEAN += $(TARGET) $(QMAKE_TARGET) bin/Gump
 
 #---------------------------------------------------------------------
 # PART 4: Input
+macx {
+    # Info.plist
+    QMAKE_INFO_PLIST = Info.plist
+
+    # Icon
+    ICON = icon.icns
+}
+
+include(gitversion.pri)
+
 SOURCES += \
     src/main.cpp \
     src/view/main_window.cpp \
@@ -53,10 +61,3 @@ HEADERS += \
 RESOURCES += \
     resource.qrc
 
-macx {
-    # Info.plist
-    QMAKE_INFO_PLIST = Info.plist
-
-    # Icon
-    ICON = icon.icns
-}
