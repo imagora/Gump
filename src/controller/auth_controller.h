@@ -57,7 +57,7 @@ class AuthController :
  private:
   AuthStatus status_;
   QOAuth2AuthorizationCodeFlow *oauth2_;
-  QNetworkAccessManager *identifier_manager_;
+  QNetworkAccessManager *network_manager_;
 };
 
 

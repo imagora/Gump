@@ -6,6 +6,10 @@
 #include <QtGlobal>
 #include <QSettings>
 
+#include "commons/singleton.h"
+#include "controller/online_controller.h"
+#include "controller/tracer_controller.h"
+
 
 namespace gump {
 
@@ -51,9 +55,21 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
     auth_controller_->RequestIdentifier(username);
   }
 
-  connect(login_widget_, SIGNAL(Login(QString)), this, SLOT(OnLogin(QString)));
-  connect(auth_controller_, SIGNAL(Status(AuthStatus)), this,
-          SLOT(OnAuthStatus(AuthStatus)));
+  config_controller_ = new ConfigController(this);
+  auto *online_controller = Singleton<OnlineController>::Instance();
+  auto *tracer_controller = Singleton<TracerController>::Instance();
+
+  connect(login_widget_, SIGNAL(Login(QString)),
+          this, SLOT(OnLogin(QString)));
+  connect(auth_controller_, SIGNAL(Status(AuthStatus)),
+          this, SLOT(OnAuthStatus(AuthStatus)));
+
+  connect(config_controller_, SIGNAL(OnlineUrlEvent(QString)),
+          online_controller, SLOT(OnUpdateUrl(QString)));
+  connect(config_controller_, SIGNAL(TracerUrlEvent(QString)),
+          tracer_controller, SLOT(OnUpdateUrl(QString)));
+  connect(config_controller_, SIGNAL(TagsEvent(std::map<QString, QString>)),
+          playlist_widget_, SLOT(OnTags(std::map<QString, QString>)));
 }
 
 void CentralWidget::OnLogin(QString username) {
@@ -78,6 +94,7 @@ void CentralWidget::OnAuthStatus(AuthStatus status) {
   if (status == AuthStatus::kAuthOAuthSuccess) {
     stacked_layout_->setCurrentIndex(
           static_cast<int>(StackedWidgetIndex::kPlaylist));
+    config_controller_->AutoRefreshConfig();
     return;
   }
 

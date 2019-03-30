@@ -12,6 +12,7 @@
 #include "view/play_widget.h"
 
 #include "controller/auth_controller.h"
+#include "controller/config_controller.h"
 
 
 namespace gump {
@@ -35,9 +36,10 @@ class CentralWidget :
   LoggingWidget *logging_widget_;
   PlaylistWidget *playlist_widget_;
   PlayWidget *play_widget_;
-  QStackedLayout *stacked_layout_;
 
+  QStackedLayout *stacked_layout_;
   AuthController *auth_controller_;
+  ConfigController *config_controller_;
 };
 
 

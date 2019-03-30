@@ -5,7 +5,10 @@
 
 #include <vector>
 #include <QWidget>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QTableWidget>
+#include <QButtonGroup>
 
 #include "view/tag.h"
 #include "view/line_edit.h"
@@ -17,18 +20,25 @@ namespace gump {
 
 class PlaylistWidget : public QWidget {
   Q_OBJECT
-public:
+ public:
   explicit PlaylistWidget(QWidget *parent = nullptr);
 
-signals:
+ signals:
+  void TagChangeEvent(QString tag_name, QString tag_info);
 
-public slots:
+ public slots:
+  void OnTags(std::map<QString, QString> tags);
 
-private:
+  void OnTagToggled(QAbstractButton *tag, bool checked);
+
+ private:
   PlayerWidget *player_;
   LineEdit *search_edit_;
   QTableWidget *stream_table_;
-  std::vector<Tag *> tags_;
+  QButtonGroup *tag_group_;
+
+  QVBoxLayout *layout_;
+  QHBoxLayout *tag_layout_;
 };
 
 

@@ -25,7 +25,7 @@ AuthController::AuthController(QObject *parent)
 
   InitOAuth();
 
-  identifier_manager_ = new QNetworkAccessManager(this);
+  network_manager_ = new QNetworkAccessManager(this);
 
   connect(oauth2_, &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
           &QDesktopServices::openUrl);
@@ -33,7 +33,7 @@ AuthController::AuthController(QObject *parent)
           SLOT(OnOAuthReply(QNetworkReply*)));
   connect(oauth2_, SIGNAL(statusChanged(Status)), this,
           SLOT(OnOAuthResponse()));
-  connect(identifier_manager_, SIGNAL(finished(QNetworkReply*)), this,
+  connect(network_manager_, SIGNAL(finished(QNetworkReply*)), this,
           SLOT(OnIdentifierReply(QNetworkReply*)));
 }
 
@@ -44,7 +44,7 @@ void AuthController::RequestIdentifier(const QString &username) {
   login_url.setQuery(query_info);
 
   qInfo() << "request identifier: " << login_url;
-  identifier_manager_->get(QNetworkRequest(login_url));
+  network_manager_->get(QNetworkRequest(login_url));
 }
 
 void AuthController::RequestOAuthToken() {
@@ -63,9 +63,6 @@ QString AuthController::GetToken() {
   }
 
   return oauth2_->token();
-//  QNetworkRequest config(QUrl("https://gump.agoralab.co/gump/update"));
-//  config.setRawHeader("Accesstoken", oauth2_->token().toLocal8Bit());
-//  identifier_manager_->get(config);
 }
 
 void AuthController::OnIdentifierReply(QNetworkReply *reply) {

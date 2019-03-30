@@ -52,7 +52,11 @@ SOURCES += \
     src/view/playlist_widget.cpp \
     src/view/play_widget.cpp \
     src/controller/auth_controller.cpp \
-    src/view/tag.cpp
+    src/view/tag.cpp \
+    src/controller/config_controller.cpp \
+    src/controller/stream_rule_controller.cpp \
+    src/controller/online_controller.cpp \
+    src/controller/tracer_controller.cpp
 HEADERS += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -75,6 +79,11 @@ HEADERS += \
     src/view/playlist_widget.h \
     src/view/play_widget.h \
     src/controller/auth_controller.h \
-    src/view/tag.h
+    src/view/tag.h \
+    src/controller/config_controller.h \
+    src/commons/singleton.h \
+    src/controller/stream_rule_controller.h \
+    src/controller/online_controller.h \
+    src/controller/tracer_controller.h
 RESOURCES += \
     resource.qrc
