@@ -49,9 +49,10 @@ SOURCES += \
     src/view/central_widget.cpp \
     src/view/line_edit.cpp \
     src/view/logging_widget.cpp \
-    src/controller/oauth_controller.cpp \
     src/view/playlist_widget.cpp \
-    src/view/play_widget.cpp
+    src/view/play_widget.cpp \
+    src/controller/auth_controller.cpp \
+    src/view/tag.cpp
 HEADERS += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -71,8 +72,9 @@ HEADERS += \
     src/view/central_widget.h \
     src/view/line_edit.h \
     src/view/logging_widget.h \
-    src/controller/oauth_controller.h \
     src/view/playlist_widget.h \
-    src/view/play_widget.h
+    src/view/play_widget.h \
+    src/controller/auth_controller.h \
+    src/view/tag.h
 RESOURCES += \
     resource.qrc

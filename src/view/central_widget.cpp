@@ -3,6 +3,9 @@
 
 #include "view/central_widget.h"
 
+#include <QtGlobal>
+#include <QSettings>
+
 
 namespace gump {
 
@@ -34,13 +37,54 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
 
   setLayout(stacked_layout_);
 
-  connect(login_widget_, SIGNAL(Login(QString, QString)), this, SLOT(OnLogin(QString, QString)));
+  auth_controller_ = new AuthController(this);
+
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("auth");
+  QString username = settings.value("username").toString();
+  settings.endGroup();
+
+  if (!username.isEmpty()) {
+    login_widget_->SetUsername(username);
+    stacked_layout_->setCurrentIndex(
+          static_cast<int>(StackedWidgetIndex::kLogging));
+    auth_controller_->RequestIdentifier(username);
+  }
+
+  connect(login_widget_, SIGNAL(Login(QString)), this, SLOT(OnLogin(QString)));
+  connect(auth_controller_, SIGNAL(Status(AuthStatus)), this,
+          SLOT(OnAuthStatus(AuthStatus)));
 }
 
-void CentralWidget::OnLogin(QString username, QString password) {
+void CentralWidget::OnLogin(QString username) {
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("auth");
+  settings.setValue("username", username);
+  settings.endGroup();
+
   logging_widget_->SetUsername(username);
+  auth_controller_->RequestIdentifier(username);
+
   stacked_layout_->setCurrentIndex(
-        static_cast<int>(StackedWidgetIndex::kPlay));
+        static_cast<int>(StackedWidgetIndex::kLogging));
+}
+
+void CentralWidget::OnAuthStatus(AuthStatus status) {
+  if (status == AuthStatus::kAuthIdentifySuccess) {
+    auth_controller_->RequestOAuthToken();
+    return;
+  }
+
+  if (status == AuthStatus::kAuthOAuthSuccess) {
+    stacked_layout_->setCurrentIndex(
+          static_cast<int>(StackedWidgetIndex::kPlaylist));
+    return;
+  }
+
+  login_widget_->SetErrorMessage(
+        QString("Error(%1): login failed").arg(static_cast<uint32_t>(status)));
+  stacked_layout_->setCurrentIndex(
+        static_cast<int>(StackedWidgetIndex::kLogin));
 }
 
 

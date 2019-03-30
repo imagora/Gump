@@ -50,12 +50,10 @@ void LoggingWidget::OnTimer() {
 }
 
 void LoggingWidget::hideEvent(QHideEvent *) {
-  qInfo() << "hide event";
   update_timer_->stop();
 }
 
-void LoggingWidget::showEvent(QShowEvent *event) {
-  qInfo() << "show event";
+void LoggingWidget::showEvent(QShowEvent *) {
   update_timer_->start();
 }
 

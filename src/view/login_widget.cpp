@@ -16,18 +16,11 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent) {
   title_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
 
   auto *username_label = new QLabel("Username", this);
-  auto *password_label = new QLabel("Password", this);
   username_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
-  password_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
   username_label->setStyleSheet("color:gray;margin-top:30px;");
-  password_label->setStyleSheet("color:gray;margin-top:20px;");
 
   username_input_ = new LineEdit(QIcon(":/username.png"), QSize(32, 32), this);
   username_input_->setPlaceholderText("Type your username");
-
-  password_input_ = new LineEdit(QIcon(":/password.png"), QSize(32, 32), this);
-  password_input_->setPlaceholderText("Type your password");
-  password_input_->setEchoMode(QLineEdit::PasswordEchoOnEdit);
 
   QPushButton *login_btn = new QPushButton("LOGIN", this);
   login_btn->setStyleSheet("QPushButton{border:2px groove gray;"
@@ -36,7 +29,7 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent) {
                            "QPushButton:hover {color:white;} "
                            "QPushButton:pressed{color:white;background:gray;}");
 
-  error_label_ = new QLabel("Error: timeout", this);
+  error_label_ = new QLabel(this);
   error_label_->setStyleSheet("color:red;margin-top:40px;");
 
   auto *layout = new QGridLayout(this);
@@ -45,14 +38,16 @@ LoginWidget::LoginWidget(QWidget *parent) : QWidget(parent) {
   layout->addWidget(title_label, 0, 1, 1, 1);
   layout->addWidget(username_label, 1, 0, 1, 1);
   layout->addWidget(username_input_, 2, 0, 1, 3);
-  layout->addWidget(password_label, 3, 0, 1, 1);
-  layout->addWidget(password_input_, 4, 0, 1, 3);
-  layout->addWidget(login_btn, 5, 0, 1, 3);
-  layout->addWidget(error_label_, 6, 0, 1, 3);
+  layout->addWidget(login_btn, 3, 0, 1, 3);
+  layout->addWidget(error_label_, 4, 0, 1, 3);
 
   setLayout(layout);
 
   connect(login_btn, SIGNAL(released()), this, SLOT(OnLogin()));
+}
+
+void LoginWidget::SetUsername(const QString &username) {
+  username_input_->setText(username);
 }
 
 void LoginWidget::SetErrorMessage(const QString &msg) {
@@ -60,7 +55,7 @@ void LoginWidget::SetErrorMessage(const QString &msg) {
 }
 
 void LoginWidget::OnLogin() {
-  emit Login(username_input_->text(), password_input_->text());
+  emit Login(username_input_->text());
 }
 
 

@@ -3,9 +3,11 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
+#include <vector>
 #include <QWidget>
 #include <QTableWidget>
 
+#include "view/tag.h"
 #include "view/line_edit.h"
 #include "view/player_widget.h"
 
@@ -26,6 +28,7 @@ private:
   PlayerWidget *player_;
   LineEdit *search_edit_;
   QTableWidget *stream_table_;
+  std::vector<Tag *> tags_;
 };
 
 

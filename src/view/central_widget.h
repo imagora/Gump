@@ -11,6 +11,8 @@
 #include "view/playlist_widget.h"
 #include "view/play_widget.h"
 
+#include "controller/auth_controller.h"
+
 
 namespace gump {
 
@@ -24,7 +26,9 @@ class CentralWidget :
  signals:
 
  public slots:
-  void OnLogin(QString username, QString password);
+  void OnLogin(QString username);
+
+  void OnAuthStatus(AuthStatus status);
 
  private:
   LoginWidget *login_widget_;
@@ -32,6 +36,8 @@ class CentralWidget :
   PlaylistWidget *playlist_widget_;
   PlayWidget *play_widget_;
   QStackedLayout *stacked_layout_;
+
+  AuthController *auth_controller_;
 };
 
 

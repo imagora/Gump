@@ -19,17 +19,18 @@ class LoginWidget :
  public:
   explicit LoginWidget(QWidget *parent = nullptr);
 
+  void SetUsername(const QString &username);
+
   void SetErrorMessage(const QString &msg);
 
  signals:
-  void Login(QString username, QString password);
+  void Login(QString username);
 
  public slots:
   void OnLogin();
 
  private:
   LineEdit *username_input_;
-  LineEdit *password_input_;
   QLabel *error_label_;
 };
 
