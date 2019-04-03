@@ -37,7 +37,6 @@ SOURCES += \
     src/view/main_menubar.cpp \
     src/controller/log_dock_appender.cpp \
     src/view/player_widget.cpp \
-    src/controller/preferences_manager.cpp \
     src/view/application.cpp \
     src/controller/search_event.cpp \
     src/view/login_widget.cpp \
@@ -61,7 +60,6 @@ HEADERS += \
     src/view/log_dock.h \
     src/controller/log_dock_appender.h \
     src/view/player_widget.h \
-    src/controller/preferences_manager.h \
     src/view/application.h \
     src/controller/search_event.h \
     src/view/login_widget.h \

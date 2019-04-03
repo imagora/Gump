@@ -29,17 +29,5 @@ enum LogLevel {
 
 static const char kLoggerName[] = "GUMP";
 
-struct StreamInfo {
-  uint32_t ip;
-  uint32_t mode;
-  uint32_t status;
-  uint32_t user_id;
-  uint32_t create_ts;
-  std::string stream_url;
-};
-
-typedef std::pair<std::string, std::string> ChannelKey;
-typedef std::vector<StreamInfo> Streams;
-typedef std::map<ChannelKey, Streams> ChannelStreams;
 
 }  // namespace gump
