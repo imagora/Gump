@@ -3,12 +3,16 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
+#include <QUrl>
 #include <vector>
 #include <QWidget>
+#include <QKeyEvent>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QTableWidget>
 #include <QButtonGroup>
+
+#include "commons/stream_info.h"
 
 #include "view/tag.h"
 #include "view/line_edit.h"
@@ -31,6 +35,22 @@ class PlaylistWidget : public QWidget {
 
   void OnTagToggled(QAbstractButton *tag, bool checked);
 
+  void OnUpdateList(MultiStreams streams);
+
+  void OnSearchItem(const QString &search);
+
+  void OnItemSelected(QTableWidgetItem *item);
+
+ protected:
+ void keyReleaseEvent(QKeyEvent *event) override;
+
+ private:
+  void InsertTableRow(const QString &name, const QUrl &stream);
+
+  void RemoveTableRow(const QString &name, const QUrl &stream);
+
+  QString GetPlayUrl(int row);
+
  private:
   PlayerWidget *player_;
   LineEdit *search_edit_;
@@ -39,6 +59,8 @@ class PlaylistWidget : public QWidget {
 
   QVBoxLayout *layout_;
   QHBoxLayout *tag_layout_;
+
+  MultiStreams streams_;
 };
 
 

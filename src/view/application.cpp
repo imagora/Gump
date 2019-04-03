@@ -5,7 +5,9 @@
 #include <QFileOpenEvent>
 #include <QDebug>
 
+#include "commons/singleton.h"
 #include "controller/search_event.h"
+#include "controller/player_controller.h"
 
 
 namespace gump {
@@ -13,6 +15,9 @@ namespace gump {
 
 Application::Application(int &argc, char **argv) : QApplication (argc, argv) {
   event_receiver_ = nullptr;
+
+  connect(this, SIGNAL(aboutToQuit()),
+          Singleton<PlayerController>::Instance(), SLOT(ReleasePlayers()));
 }
 
 void Application::SetEventReceiver(QObject *obj) {

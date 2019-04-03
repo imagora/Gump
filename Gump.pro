@@ -56,7 +56,8 @@ SOURCES += \
     src/controller/config_controller.cpp \
     src/controller/stream_rule_controller.cpp \
     src/controller/online_controller.cpp \
-    src/controller/tracer_controller.cpp
+    src/controller/tracer_controller.cpp \
+    src/controller/player_controller.cpp
 HEADERS += \
     src/view/main_window.h \
     src/view/about_dialog.h \
@@ -84,6 +85,8 @@ HEADERS += \
     src/commons/singleton.h \
     src/controller/stream_rule_controller.h \
     src/controller/online_controller.h \
-    src/controller/tracer_controller.h
+    src/controller/tracer_controller.h \
+    src/commons/stream_info.h \
+    src/controller/player_controller.h
 RESOURCES += \
     resource.qrc

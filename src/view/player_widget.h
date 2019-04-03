@@ -21,7 +21,9 @@ class PlayerWidget :
  public:
   explicit PlayerWidget(QWidget *parent = nullptr);
 
-  virtual ~PlayerWidget();
+  void PlayStream(const QString &stream);
+
+  void BufferStream(const QString &stream);
 
   void PlayStream(const std::string &stream);
 

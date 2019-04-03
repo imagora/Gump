@@ -9,6 +9,7 @@
 #include "commons/singleton.h"
 #include "controller/online_controller.h"
 #include "controller/tracer_controller.h"
+#include "controller/player_controller.h"
 
 
 namespace gump {
@@ -70,6 +71,8 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
           tracer_controller, SLOT(OnUpdateUrl(QString)));
   connect(config_controller_, SIGNAL(TagsEvent(std::map<QString, QString>)),
           playlist_widget_, SLOT(OnTags(std::map<QString, QString>)));
+  connect(online_controller, SIGNAL(UpdateList(MultiStreams)),
+          playlist_widget_, SLOT(OnUpdateList(MultiStreams)));
 }
 
 void CentralWidget::OnLogin(QString username) {

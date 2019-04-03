@@ -70,7 +70,7 @@ void MainCentralWidget::SearchItem(const std::string &search) {
 }
 
 void MainCentralWidget::PlayStream() {
-  player_widget_->PlayStream("");
+  player_widget_->PlayStream(std::string(""));
 }
 
 void MainCentralWidget::PauseStream() {

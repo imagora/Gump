@@ -14,6 +14,8 @@
 #include <QDesktopWidget>
 
 #include "commons/definations.h"
+#include "commons/singleton.h"
+#include "controller/player_controller.h"
 
 
 namespace gump {
@@ -58,11 +60,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     return;
   }
 
-  player_ = new QtAV::AVPlayer(this);
-  buffered_player_ = new QtAV::AVPlayer(this);
+//  player_ = new QtAV::AVPlayer(this);
+//  buffered_player_ = new QtAV::AVPlayer(this);
 
-  player_->addVideoRenderer(video_output_);
-  player_status_ = new QLabel(PlayerStatus(), this);
+//  player_->addVideoRenderer(video_output_);
+//  player_status_ = new QLabel(PlayerStatus(), this);
+  player_status_ = new QLabel("TODO", this);
   QPalette pe;
   pe.setColor(QPalette::WindowText, Qt::red);
   player_status_->setPalette(pe);
@@ -76,17 +79,22 @@ PlayerWidget::PlayerWidget(QWidget *parent)
   setLayout(main_layout);
   player_status_->raise();
 
-  connect(player_, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this,
-          SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
-  connect(player_, SIGNAL(error(QtAV::AVError)), this,
-          SLOT(OnPlayerError(QtAV::AVError)));
-  connect(buffered_player_, SIGNAL(error(QtAV::AVError)), this,
-          SLOT(OnPlayerError(QtAV::AVError)));
+//  connect(player_, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this,
+//          SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
+//  connect(player_, SIGNAL(error(QtAV::AVError)), this,
+//          SLOT(OnPlayerError(QtAV::AVError)));
+//  connect(buffered_player_, SIGNAL(error(QtAV::AVError)), this,
+//          SLOT(OnPlayerError(QtAV::AVError)));
 
-  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
+//  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
 }
 
-PlayerWidget::~PlayerWidget() {
+void PlayerWidget::PlayStream(const QString &stream) {
+  Singleton<PlayerController>::Instance()->PlayStream(stream, video_output_);
+}
+
+void PlayerWidget::BufferStream(const QString &stream) {
+  Singleton<PlayerController>::Instance()->BufferStream(stream);
 }
 
 void PlayerWidget::PlayStream(const std::string &stream) {
