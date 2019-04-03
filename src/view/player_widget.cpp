@@ -60,10 +60,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
     return;
   }
 
-//  player_ = new QtAV::AVPlayer(this);
-//  buffered_player_ = new QtAV::AVPlayer(this);
-
-//  player_->addVideoRenderer(video_output_);
 //  player_status_ = new QLabel(PlayerStatus(), this);
   player_status_ = new QLabel("TODO", this);
   QPalette pe;
@@ -79,13 +75,6 @@ PlayerWidget::PlayerWidget(QWidget *parent)
   setLayout(main_layout);
   player_status_->raise();
 
-//  connect(player_, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this,
-//          SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
-//  connect(player_, SIGNAL(error(QtAV::AVError)), this,
-//          SLOT(OnPlayerError(QtAV::AVError)));
-//  connect(buffered_player_, SIGNAL(error(QtAV::AVError)), this,
-//          SLOT(OnPlayerError(QtAV::AVError)));
-
 //  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
 }
 
@@ -95,69 +84,6 @@ void PlayerWidget::PlayStream(const QString &stream) {
 
 void PlayerWidget::BufferStream(const QString &stream) {
   Singleton<PlayerController>::Instance()->BufferStream(stream);
-}
-
-void PlayerWidget::PlayStream(const std::string &stream) {
-  if (stream.empty() && !stream_.empty()) {
-    player_->pause(false);
-    return;
-  }
-
-  if (stream_ == stream) return;
-
-  if (stream == buffered_stream_) {
-    stream_ = buffered_stream_;
-    buffered_stream_.clear();
-
-    StopStream();
-    player_->clearVideoRenderers();
-
-    buffered_player_->addVideoRenderer(video_output_);
-    std::swap(player_, buffered_player_);
-
-    auto *audio = player_->audio();
-    audio->setMute(false);
-    return;
-  }
-
-  player_->play(QString::fromStdString(stream));
-  stream_ = stream;
-}
-
-void PlayerWidget::BufferStream(const std::string &stream) {
-  if (buffered_stream_ == stream) return;
-
-  if (buffered_player_->isPlaying()) {
-    buffered_player_->stop();
-  }
-
-  buffered_player_->play(QString::fromStdString(stream));
-  auto *audio = buffered_player_->audio();
-  audio->setMute();
-
-  buffered_stream_ = stream;
-}
-
-void PlayerWidget::StopStream() {
-  if (player_->isPlaying()) {
-    player_->stop();
-  }
-}
-
-void PlayerWidget::StartStream() {
-  if (!player_->isPlaying() && !stream_.empty()) {
-    player_->play(QString::fromStdString(stream_));
-    return;
-  }
-
-  if (player_->isPaused()) {
-    player_->pause(false);
-    return;
-  }
-}
-
-void PlayerWidget::PauseStream() {
-  player_->pause();
 }
 
 void PlayerWidget::ShowDetails() {
@@ -181,67 +107,8 @@ void PlayerWidget::WindowMove() {
 }
 
 void PlayerWidget::OnMediaStatusChanged(QtAV::MediaStatus status) {
-  player_status_->setText(PlayerStatus(status));
-  player_status_->raise();
-}
-
-void PlayerWidget::OnPlayerError(const QtAV::AVError &e) {
-  LOG4CPLUS_ERROR_FMT(kLoggerName, "player error[%d]: %s", e.error(),
-                      e.string().toLatin1().data());
-}
-
-void PlayerWidget::RefreshMediaInfoTimer() {
-  QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
-  if (!player_->isPlaying()) {
-    return;
-  }
-
-  QString player_status = PlayerStatus();
-  if (is_show_details_) {
-    const QtAV::Statistics &avstat = player_->statistics();
-    if (avstat.audio.available) {
-      player_status += "\nAudio:";
-      player_status +=
-          QString::fromLatin1("\n\tCodec: %1").arg(avstat.audio.codec);
-      player_status +=
-          QString::fromLatin1("\n\tBitrate: %1").arg(avstat.audio.bit_rate);
-      player_status +=
-          QString::fromLatin1("\n\tSamplerate: %1").arg(
-            avstat.audio_only.sample_rate);
-      player_status +=
-          QString::fromLatin1("\n\tAudioChannels: %1").arg(
-            avstat.audio_only.channels);
-    }
-
-    if (avstat.video.available) {
-      player_status += "\nVideo:";
-      player_status +=
-          QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
-      player_status +=
-          QString::fromLatin1("\n\tFPS: %1").arg(
-            avstat.video_only.currentDisplayFPS());
-      player_status +=
-          QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
-      player_status +=
-          QString::fromLatin1("\n\tResolution: %1x%2").arg(
-            avstat.video_only.width).arg(avstat.video_only.height);
-    }
-  }
-
-  player_status_->setText(player_status);
-  player_status_->raise();
-}
-
-QString PlayerWidget::PlayerStatus(uint32_t status) {
-  if (status == QtAV::UnknownMediaStatus) {
-    status = player_->mediaStatus();
-  }
-
-  auto iter = kStatusStr.find(status);
-  if (iter == kStatusStr.end()) {
-    iter = kStatusStr.begin();
-  }
-  return iter->second.c_str();
+//  player_status_->setText(PlayerStatus(status));
+//  player_status_->raise();
 }
 
 

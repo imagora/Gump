@@ -7,7 +7,6 @@
 #include <QtGlobal>
 #include <QApplication>
 
-#include "view/main_window.h"
 #include "view/application.h"
 #include "view/gump_window.h"
 #include "commons/definations.h"
