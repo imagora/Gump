@@ -32,13 +32,9 @@ include(gitversion.pri)
 
 SOURCES += \
     src/main.cpp \
-    src/view/main_window.cpp \
     src/view/about_dialog.cpp \
-    src/view/main_menubar.cpp \
-    src/view/preferences_dialog.cpp \
-    src/view/main_central_widget.cpp \
-    src/view/main_toolbar.cpp \
     src/view/log_dock.cpp \
+    src/view/main_menubar.cpp \
     src/controller/log_dock_appender.cpp \
     src/view/player_widget.cpp \
     src/controller/preferences_manager.cpp \
@@ -59,13 +55,9 @@ SOURCES += \
     src/controller/tracer_controller.cpp \
     src/controller/player_controller.cpp
 HEADERS += \
-    src/view/main_window.h \
     src/view/about_dialog.h \
-    src/view/main_menubar.h \
-    src/view/preferences_dialog.h \
-    src/view/main_central_widget.h \
     src/commons/definations.h \
-    src/view/main_toolbar.h \
+    src/view/main_menubar.h \
     src/view/log_dock.h \
     src/controller/log_dock_appender.h \
     src/view/player_widget.h \

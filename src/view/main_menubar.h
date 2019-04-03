@@ -8,7 +8,7 @@
 #include <QMenuBar>
 
 #include "view/about_dialog.h"
-#include "view/preferences_dialog.h"
+//#include "view/preferences_dialog.h"
 
 
 namespace gump {
@@ -23,8 +23,6 @@ class MainMenuBar : public QMenuBar {
   virtual ~MainMenuBar();
 
  private:
-  void InitSettingsMenu();
-
   void InitWindowMenu();
 
   void InitHelpMenu();
@@ -32,12 +30,9 @@ class MainMenuBar : public QMenuBar {
  private slots:
   void OpenAboutDlg();
 
-  void OpenPreferencesDlg();
-
  private:
   std::map<uint32_t, QMenu*> menus_;
   AboutDialog *about_dlg_;
-  PreferencesDialog *preferences_dlg_;
 };
 
 
