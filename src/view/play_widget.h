@@ -5,6 +5,8 @@
 
 
 #include <QWidget>
+#include <QMouseEvent>
+
 #include "view/player_widget.h"
 
 
@@ -17,8 +19,14 @@ class PlayWidget : public QWidget {
   explicit PlayWidget(QWidget *parent = nullptr);
 
  signals:
+  void QuitPlayEvent();
 
  public slots:
+
+ protected:
+  void keyReleaseEvent(QKeyEvent *event) override;
+
+  virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
  private:
   PlayerWidget *player_;

@@ -64,6 +64,10 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
           this, SLOT(OnLogin(QString)));
   connect(auth_controller_, SIGNAL(Status(AuthStatus)),
           this, SLOT(OnAuthStatus(AuthStatus)));
+  connect(playlist_widget_, SIGNAL(ItemSelectedEvent()),
+          this, SLOT(OnPlaylistSelected()));
+  connect(play_widget_, SIGNAL(QuitPlayEvent()),
+          this, SLOT(OnPlayQuit()));
 
   connect(config_controller_, SIGNAL(OnlineUrlEvent(QString)),
           online_controller, SLOT(OnUpdateUrl(QString)));
@@ -71,8 +75,6 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
           tracer_controller, SLOT(OnUpdateUrl(QString)));
   connect(config_controller_, SIGNAL(TagsEvent(std::map<QString, QString>)),
           playlist_widget_, SLOT(OnTags(std::map<QString, QString>)));
-  connect(online_controller, SIGNAL(UpdateList(MultiStreams)),
-          playlist_widget_, SLOT(OnUpdateList(MultiStreams)));
 }
 
 void CentralWidget::OnLogin(QString username) {
@@ -105,6 +107,16 @@ void CentralWidget::OnAuthStatus(AuthStatus status) {
         QString("Error(%1): login failed").arg(static_cast<uint32_t>(status)));
   stacked_layout_->setCurrentIndex(
         static_cast<int>(StackedWidgetIndex::kLogin));
+}
+
+void CentralWidget::OnPlaylistSelected() {
+  stacked_layout_->setCurrentIndex(
+        static_cast<int>(StackedWidgetIndex::kPlay));
+}
+
+void CentralWidget::OnPlayQuit() {
+  stacked_layout_->setCurrentIndex(
+        static_cast<int>(StackedWidgetIndex::kPlaylist));
 }
 
 

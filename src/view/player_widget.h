@@ -14,8 +14,7 @@
 namespace gump {
 
 
-class PlayerWidget :
-    public QWidget {
+class PlayerWidget : public QWidget {
   Q_OBJECT
 
  public:
@@ -31,6 +30,9 @@ class PlayerWidget :
 
  private slots:
   void OnMediaStatusChanged(QtAV::MediaStatus status);
+
+ protected:
+  virtual void showEvent(QShowEvent *event) override;
 
  private:
   bool is_show_details_;

@@ -21,6 +21,8 @@ class PlayerController : public QObject {
 
   void BufferStream(const QString &stream);
 
+  void ResetRenderer(QtAV::VideoOutput *renderer);
+
  signals:
   void StatusChangeEvent(QString status);
 

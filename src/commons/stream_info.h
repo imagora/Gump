@@ -5,8 +5,7 @@
 
 #include <map>
 #include <vector>
-
-#include <QUrl>
+#include <QString>
 
 
 namespace gump {
@@ -14,16 +13,14 @@ namespace gump {
 
 struct Stream {
   uint32_t ip;
-  uint32_t mode;
-  uint32_t status;
   uint32_t user_id;
   uint32_t create_ts;
-  QUrl stream_url;
+
+  QString name;
 };
 
 
-using StreamDetails = std::vector<Stream>;
-using MultiStreams = std::map<QString, StreamDetails>;
+using Streams = std::map<QString, Stream>;
 
 
 }  // namespace gump

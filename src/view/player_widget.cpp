@@ -108,7 +108,11 @@ void PlayerWidget::WindowMove() {
 
 void PlayerWidget::OnMediaStatusChanged(QtAV::MediaStatus status) {
 //  player_status_->setText(PlayerStatus(status));
-//  player_status_->raise();
+  //  player_status_->raise();
+}
+
+void PlayerWidget::showEvent(QShowEvent *) {
+  Singleton<PlayerController>::Instance()->ResetRenderer(video_output_);
 }
 
 

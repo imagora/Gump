@@ -3,6 +3,8 @@
 
 #include "view/play_widget.h"
 
+#include <QDebug>
+
 
 namespace gump {
 
@@ -10,6 +12,16 @@ namespace gump {
 PlayWidget::PlayWidget(QWidget *parent) : QWidget(parent) {
   player_ = new PlayerWidget(this);
   player_->setFixedSize(QSize(360, 640));
+}
+
+void PlayWidget::keyReleaseEvent(QKeyEvent *event) {
+  if (event->key() == Qt::Key_Escape) {
+    emit QuitPlayEvent();
+  }
+}
+
+void PlayWidget::mouseDoubleClickEvent(QMouseEvent *) {
+  emit QuitPlayEvent();
 }
 
 

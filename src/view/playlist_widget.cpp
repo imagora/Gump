@@ -25,13 +25,10 @@ PlaylistWidget::PlaylistWidget(QWidget *parent)
   stream_table_ = new QTableWidget(this);
   stream_table_->setStyleSheet("color:gray");
   stream_table_->setContextMenuPolicy(Qt::CustomContextMenu);
-  stream_table_->setColumnCount(2);
-  stream_table_->setHorizontalHeaderLabels(
-        QStringList{"NAME", "STREAM"});
+  stream_table_->setColumnCount(1);
+  stream_table_->setHorizontalHeaderLabels(QStringList{"STREAM"});
   stream_table_->horizontalHeader()->setSectionResizeMode(
-        0, QHeaderView::ResizeToContents);
-  stream_table_->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::Stretch);
+        0, QHeaderView::Stretch);
 
   tag_layout_ = new QHBoxLayout();
   tag_layout_->setSpacing(5);
@@ -50,8 +47,18 @@ PlaylistWidget::PlaylistWidget(QWidget *parent)
 
   connect(tag_group_, SIGNAL(buttonToggled(QAbstractButton*, bool)),
           this, SLOT(OnTagToggled(QAbstractButton*, bool)));
-  connect(stream_table_, SIGNAL(itemClicked(QTableWidgetItem*)), this,
-          SLOT(OnItemSelected(QTableWidgetItem*)));
+  connect(stream_table_, SIGNAL(itemClicked(QTableWidgetItem*)),
+          this, SLOT(OnItemClicked(QTableWidgetItem*)));
+  connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)),
+          this, SLOT(OnItemDoubleClicked(QTableWidgetItem*)));
+
+  auto *online_controller = Singleton<OnlineController>::Instance();
+  connect(online_controller, SIGNAL(RemoveAllEvent()),
+          this, SLOT(OnRemoveAll()));
+  connect(online_controller, SIGNAL(InsertStreamEvent(QString)),
+          this, SLOT(OnInsertStream(QString)));
+  connect(online_controller, SIGNAL(RemoveStreamEvent(QString)),
+          this, SLOT(OnRemoveStream(QString)));
 }
 
 void PlaylistWidget::OnTags(std::map<QString, QString> tags) {
@@ -112,57 +119,33 @@ void PlaylistWidget::OnTagToggled(QAbstractButton *tag, bool checked) {
   }
 }
 
-void PlaylistWidget::OnUpdateList(MultiStreams streams) {
-
-  auto current_row = stream_table_->currentRow();
-  QString selected_stream;
-  if (current_row > 0) {
-    selected_stream = stream_table_->item(current_row, 1)->text();
+void PlaylistWidget::OnRemoveAll() {
+  for (int i = stream_table_->rowCount(); i > 0; --i) {
+    stream_table_->removeRow(i - 1);
   }
+}
 
-  for (auto channel : streams_) {
-    auto iter = streams.find(channel.first);
-    if (iter == streams.end()) {
-      RemoveTableRow(channel.first, QUrl(""));
-      continue;
-    }
+void PlaylistWidget::OnInsertStream(QString stream) {
+  stream_table_->insertRow(stream_table_->rowCount());
+  int row = stream_table_->rowCount() - 1;
 
-    for (auto stream : channel.second) {
-      auto stream_iter = std::find_if(iter->second.begin(), iter->second.end(),
-                                      [&](const Stream &item){
-        return item.stream_url == stream.stream_url;
-      });
-      if (stream_iter == iter->second.end()) {
-        RemoveTableRow(channel.first, stream.stream_url);
-      }
-    }
+  QUrl stream_url(stream);
+  QTableWidgetItem *stream_item = new QTableWidgetItem(stream_url.fileName());
+
+  stream_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
+
+//  stream_item->setToolTip(config_mgr_->ConvertToToolTip(stream).c_str());
+
+  stream_table_->setItem(row, 0, stream_item);
+}
+
+void PlaylistWidget::OnRemoveStream(QString stream) {
+  QUrl stream_url(stream);
+  QList<QTableWidgetItem *> find_items =
+      stream_table_->findItems(stream_url.fileName(), Qt::MatchExactly);
+  foreach (QTableWidgetItem *item, find_items) {
+    stream_table_->removeRow(item->row());
   }
-
-  for (auto channel : streams) {
-    auto iter = streams_.find(channel.first);
-    if (iter == streams_.end()) {
-      for (auto stream : channel.second) {
-        InsertTableRow(channel.first, stream.stream_url);
-      }
-      continue;
-    }
-
-    for (auto stream : channel.second) {
-      auto stream_iter = std::find_if(iter->second.begin(), iter->second.end(),
-                                      [&](const Stream &item){
-        return item.stream_url == stream.stream_url;
-      });
-      if (stream_iter == iter->second.end()) {
-        InsertTableRow(channel.first, stream.stream_url);
-      }
-    }
-  }
-
-  if (!selected_stream.isEmpty()) {
-    OnSearchItem(selected_stream);
-  }
-
-  streams_.swap(streams);
 }
 
 void PlaylistWidget::OnSearchItem(const QString &search) {
@@ -173,7 +156,7 @@ void PlaylistWidget::OnSearchItem(const QString &search) {
   stream_table_->selectRow((*find_items.begin())->row());
 }
 
-void PlaylistWidget::OnItemSelected(QTableWidgetItem *item) {
+void PlaylistWidget::OnItemClicked(QTableWidgetItem *item) {
   stream_table_->selectRow(item->row());
 
   QString play_url = GetPlayUrl(item->row());
@@ -196,76 +179,30 @@ void PlaylistWidget::OnItemSelected(QTableWidgetItem *item) {
   }
 }
 
+void PlaylistWidget::OnItemDoubleClicked(QTableWidgetItem *) {
+  emit ItemSelectedEvent();
+}
+
 void PlaylistWidget::keyReleaseEvent(QKeyEvent *event) {
   if (event->key() != Qt::Key_Up &&
       event->key() != Qt::Key_Down) {
     return;
   }
 
-  int row = stream_table_->currentRow();
-  QTableWidgetItem *item = stream_table_->item(row, 1);
-  OnItemSelected(item);
-}
-
-void PlaylistWidget::InsertTableRow(const QString &name,
-                                    const QUrl &stream) {
-  stream_table_->insertRow(stream_table_->rowCount());
-  int row = stream_table_->rowCount() - 1;
-  QTableWidgetItem *name_item = new QTableWidgetItem(name);
-  QTableWidgetItem *stream_item = new QTableWidgetItem(stream.fileName());
-
-  name_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
-  stream_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
-
-  name_item->setToolTip(name);
-//  stream_item->setToolTip(config_mgr_->ConvertToToolTip(stream).c_str());
-
-  stream_table_->setItem(row, 0, name_item);
-  stream_table_->setItem(row, 1, stream_item);
-}
-
-void PlaylistWidget::RemoveTableRow(const QString &name,
-                                    const QUrl &stream) {
-  if (stream.isEmpty()) {
-    QList<QTableWidgetItem *> find_items =
-        stream_table_->findItems(name, Qt::MatchExactly);
-
-    std::set<int> row_to_remove;
-    foreach (QTableWidgetItem *item, find_items) {
-      row_to_remove.insert(item->row());
-    }
-
-    for (auto it = row_to_remove.rbegin(); it != row_to_remove.rend(); ++it) {
-      stream_table_->removeRow(*it);
-    }
-    return;
-  }
-
-  QList<QTableWidgetItem *> find_items =
-      stream_table_->findItems(stream.fileName(), Qt::MatchExactly);
-  foreach (QTableWidgetItem *item, find_items) {
-    int row = item->row();
-    if (stream_table_->item(row, 0)->text() != name) continue;
-    stream_table_->removeRow(item->row());
-  }
+  OnItemClicked(stream_table_->currentItem());
 }
 
 QString PlaylistWidget::GetPlayUrl(int row) {
-  QString name = stream_table_->item(row, 0)->text();
-  QString stream = stream_table_->item(row, 1)->text();
+  QString stream = stream_table_->item(row, 0)->text();
 
-  auto channel_it = streams_.find(name);
-  if (channel_it == streams_.end()) return "";
-
-  auto stream_it =
-      std::find_if(channel_it->second.begin(), channel_it->second.end(),
-                   [&](const Stream &detail){
-    return stream == detail.stream_url.fileName();
-  });
-  if (stream_it == channel_it->second.end()) return "";
+  QString stream_url;
+  if (!Singleton<OnlineController>::Instance()->QueryStream(stream, &stream_url,
+                                                            nullptr)) {
+    return "";
+  }
 
   return Singleton<StreamRuleController>::Instance()->ConvertToPlayUrl(
-        stream_it->stream_url.toString());
+        stream_url);
 }
 
 

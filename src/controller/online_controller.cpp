@@ -29,7 +29,7 @@ void OnlineController::UpdateInfo(const QString &name, const QString &info) {
   query_info_.clear();
   if (info.isEmpty()) {
     request_timer_->stop();
-    emit UpdateList(MultiStreams());
+    emit RemoveAllEvent();
     return;
   }
 
@@ -41,6 +41,23 @@ void OnlineController::UpdateInfo(const QString &name, const QString &info) {
   }
 
   RequestOnline();
+}
+
+bool OnlineController::QueryStream(const QString &stream, QString *url,
+                                   Stream *info) {
+  auto stream_it = std::find_if(streams_.begin(), streams_.end(),
+                                [&](const Streams::value_type &stream_info){
+    return QUrl(stream_info.first).fileName() == stream;
+  });
+
+  if (stream_it == streams_.end()) return false;
+
+  *url = stream_it->first;
+
+  if (info != nullptr) {
+    *info = stream_it->second;
+  }
+  return true;
 }
 
 void OnlineController::OnUpdateUrl(QString url) {
@@ -56,7 +73,7 @@ void OnlineController::OnNetworkReply(QNetworkReply *reply) {
     return;
   }
 
-  MultiStreams multi_streams;
+  Streams multi_streams;
   if (doc.isObject()) {
     QJsonObject obj = doc.object();
     auto success_iter = obj.find("success");
@@ -79,26 +96,21 @@ void OnlineController::OnNetworkReply(QNetworkReply *reply) {
     QJsonArray streams = data.find("streams").value().toArray();
     foreach (QJsonValue stream_value, streams) {
       QJsonObject stream = stream_value.toObject();
-      QString cname = stream.find("cname").value().toString();
 
       Stream stream_info;
       stream_info.ip =
           static_cast<uint32_t>(stream.find("lbes_ip").value().toInt());
-      stream_info.mode =
-          static_cast<uint32_t>(stream.find("mode").value().toInt());
-      stream_info.status =
-          static_cast<uint32_t>(stream.find("status").value().toInt());
       stream_info.user_id =
           static_cast<uint32_t>(stream.find("uid").value().toInt());
       stream_info.create_ts =
           static_cast<uint32_t>(stream.find("create").value().toInt());
-      stream_info.stream_url = QUrl(stream.find("url").value().toString());
+      stream_info.name = stream.find("cname").value().toString();
 
-      multi_streams[cname].push_back(stream_info);
+      multi_streams[stream.find("url").value().toString()] = stream_info;
     }
   }
 
-  emit UpdateList(multi_streams);
+  UpdateList(multi_streams);
 }
 
 void OnlineController::OnRequestOnline() {
@@ -117,6 +129,40 @@ void OnlineController::RequestOnline() {
 
   online_url_.setQuery(query_info_);
   network_reply_ = network_manager_->get(QNetworkRequest(online_url_));
+}
+
+void OnlineController::UpdateList(const Streams &streams) {
+  RemoveQuit(streams);
+
+  InsertJoin(streams);
+
+  Q_ASSERT_X(streams.size() == streams_.size(), "online", "streams size error");
+}
+
+void OnlineController::RemoveQuit(const Streams &streams) {
+  auto old_stream_it = streams_.begin();
+  while (old_stream_it != streams_.end()) {
+    auto new_stream_it = streams.find(old_stream_it->first);
+    if (new_stream_it == streams.end()) {
+      emit RemoveStreamEvent(old_stream_it->first);
+      old_stream_it = streams_.erase(old_stream_it);
+      continue;
+    }
+    ++old_stream_it;
+  }
+}
+
+void OnlineController::InsertJoin(const Streams &streams) {
+  auto new_stream_it = streams.begin();
+  while (new_stream_it != streams.end()) {
+    auto old_stream_it = streams_.find(new_stream_it->first);
+    if (old_stream_it == streams_.end()) {
+      emit InsertStreamEvent(new_stream_it->first);
+      streams_[new_stream_it->first] = new_stream_it->second;
+    }
+
+    ++new_stream_it;
+  }
 }
 
 

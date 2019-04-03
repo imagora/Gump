@@ -30,25 +30,29 @@ class PlaylistWidget : public QWidget {
  signals:
   void TagChangeEvent(QString tag_name, QString tag_info);
 
+  void ItemSelectedEvent();
+
  public slots:
   void OnTags(std::map<QString, QString> tags);
 
   void OnTagToggled(QAbstractButton *tag, bool checked);
 
-  void OnUpdateList(MultiStreams streams);
+  void OnRemoveAll();
+
+  void OnInsertStream(QString stream);
+
+  void OnRemoveStream(QString stream);
 
   void OnSearchItem(const QString &search);
 
-  void OnItemSelected(QTableWidgetItem *item);
+  void OnItemClicked(QTableWidgetItem *item);
+
+  void OnItemDoubleClicked(QTableWidgetItem *item);
 
  protected:
- void keyReleaseEvent(QKeyEvent *event) override;
+  virtual void keyReleaseEvent(QKeyEvent *event) override;
 
  private:
-  void InsertTableRow(const QString &name, const QUrl &stream);
-
-  void RemoveTableRow(const QString &name, const QUrl &stream);
-
   QString GetPlayUrl(int row);
 
  private:
@@ -60,7 +64,7 @@ class PlaylistWidget : public QWidget {
   QVBoxLayout *layout_;
   QHBoxLayout *tag_layout_;
 
-  MultiStreams streams_;
+  Streams streams_;
 };
 
 

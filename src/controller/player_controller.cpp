@@ -82,8 +82,16 @@ void PlayerController::BufferStream(const QString &stream) {
   ResizeBuffer();
 }
 
+void PlayerController::ResetRenderer(QtAV::VideoOutput *renderer) {
+  if (buffered_players_.size() > 0) {
+    auto *player = buffered_players_.front().player;
+    player->clearVideoRenderers();
+    player->addVideoRenderer(renderer);
+  }
+}
+
 void PlayerController::ReleasePlayers() {
-  qInfo() << "release...";
+  qInfo() << "waiting for release players";
   for (auto &player : buffered_players_) {
     player.player->clearVideoRenderers();
     player.player->audio()->setMute();

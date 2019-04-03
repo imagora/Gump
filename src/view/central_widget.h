@@ -31,6 +31,10 @@ class CentralWidget :
 
   void OnAuthStatus(AuthStatus status);
 
+  void OnPlaylistSelected();
+
+  void OnPlayQuit();
+
  private:
   LoginWidget *login_widget_;
   LoggingWidget *logging_widget_;
