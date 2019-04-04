@@ -29,6 +29,8 @@ class OnlineController : public QObject {
 
   bool QueryStream(const QString &stream, QString *url, Stream *info);
 
+  bool GetNextStream(const QString &stream, QString *url, Stream *info);
+
  signals:
   void RemoveAllEvent();
 

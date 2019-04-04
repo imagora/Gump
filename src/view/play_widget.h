@@ -24,9 +24,11 @@ class PlayWidget : public QWidget {
  public slots:
 
  protected:
-  void keyReleaseEvent(QKeyEvent *event) override;
+  virtual void keyReleaseEvent(QKeyEvent *event) override;
 
   virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
+
+  virtual void showEvent(QShowEvent *event) override;
 
  private:
   PlayerWidget *player_;

@@ -17,11 +17,15 @@ class PlayerController : public QObject {
  public:
   explicit PlayerController(QObject *parent = nullptr);
 
-  void PlayStream(const QString &stream, QtAV::VideoOutput *renderer);
+  void PlayStream(const QString &stream);
 
   void BufferStream(const QString &stream);
 
-  void ResetRenderer(QtAV::VideoOutput *renderer);
+  void SetRenderer(QtAV::VideoOutput *renderer);
+
+  QString GetCurrentStream();
+
+  QString GetCurrentStatus();
 
  signals:
   void StatusChangeEvent(QString status);
@@ -39,12 +43,13 @@ class PlayerController : public QObject {
  private:
   struct BufferedPlayer {
     QString stream;
-    QtAV::AVPlayer *player;
+    QtAV::AVPlayer *player = nullptr;
   };
 
  private:
-  uint32_t max_size_;
-  std::list<BufferedPlayer> buffered_players_;
+  QtAV::VideoOutput *renderer_;
+  std::list<BufferedPlayer> old_players_;
+  std::list<BufferedPlayer> new_players_;
 };
 
 

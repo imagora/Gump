@@ -5,6 +5,7 @@
 
 #include <map>
 #include <vector>
+#include <QUrl>
 #include <QString>
 
 
@@ -17,6 +18,7 @@ struct Stream {
   uint32_t create_ts;
 
   QString name;
+  QUrl url;
 };
 
 

@@ -21,19 +21,6 @@
 namespace gump {
 
 
-const static std::map<uint32_t, std::string> kStatusStr = {
-  { QtAV::UnknownMediaStatus, "Unknown" },
-  { QtAV::NoMedia, "No Media" },
-  { QtAV::LoadingMedia, "Loading Media" },
-  { QtAV::LoadedMedia, "Loaded Media" },
-  { QtAV::StalledMedia, "Stalled Media" },
-  { QtAV::BufferingMedia, "Buffering Media" },
-  { QtAV::BufferedMedia, "Buffered Media" },
-  { QtAV::EndOfMedia, "End Of Media" },
-  { QtAV::InvalidMedia, "Invalid Media" },
-};
-
-
 PlayerWidget::PlayerWidget(QWidget *parent)
     : QWidget(parent) {
   is_show_details_ = false;
@@ -55,13 +42,12 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 
   video_output_ = new QtAV::VideoOutput(QtAV::VideoRendererId_Widget, this);
   if (!video_output_->widget()) {
-    LOG4CPLUS_ERROR_STR(kLoggerName,
-                        "Error: can not create video renderer retina");
+    qCritical() << "Error: can not create video renderer retina";
     return;
   }
 
 //  player_status_ = new QLabel(PlayerStatus(), this);
-  player_status_ = new QLabel("TODO", this);
+  player_status_ = new QLabel("", this);
   QPalette pe;
   pe.setColor(QPalette::WindowText, Qt::red);
   player_status_->setPalette(pe);
@@ -79,7 +65,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
 }
 
 void PlayerWidget::PlayStream(const QString &stream) {
-  Singleton<PlayerController>::Instance()->PlayStream(stream, video_output_);
+  Singleton<PlayerController>::Instance()->PlayStream(stream);
 }
 
 void PlayerWidget::BufferStream(const QString &stream) {
@@ -106,13 +92,23 @@ void PlayerWidget::WindowMove() {
                      current_screen_number_, current_screen_ratio_);
 }
 
-void PlayerWidget::OnMediaStatusChanged(QtAV::MediaStatus status) {
-//  player_status_->setText(PlayerStatus(status));
+void PlayerWidget::OnStatusChanged(QString status) {
+  player_status_->setText(status);
   //  player_status_->raise();
 }
 
 void PlayerWidget::showEvent(QShowEvent *) {
-  Singleton<PlayerController>::Instance()->ResetRenderer(video_output_);
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  player_controller->SetRenderer(video_output_);
+  OnStatusChanged(player_controller->GetCurrentStatus());
+  connect(player_controller, SIGNAL(StatusChangeEvent(QString)),
+          this, SLOT(OnStatusChanged(QString)));
+}
+
+void PlayerWidget::hideEvent(QHideEvent *) {
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  disconnect(player_controller, SIGNAL(StatusChangeEvent(QString)),
+             this, SLOT(OnStatusChanged(QString)));
 }
 
 

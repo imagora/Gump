@@ -10,6 +10,7 @@
 
 #include "commons/singleton.h"
 #include "controller/online_controller.h"
+#include "controller/player_controller.h"
 #include "controller/stream_rule_controller.h"
 
 
@@ -129,8 +130,7 @@ void PlaylistWidget::OnInsertStream(QString stream) {
   stream_table_->insertRow(stream_table_->rowCount());
   int row = stream_table_->rowCount() - 1;
 
-  QUrl stream_url(stream);
-  QTableWidgetItem *stream_item = new QTableWidgetItem(stream_url.fileName());
+  QTableWidgetItem *stream_item = new QTableWidgetItem(stream);
 
   stream_item->setFlags(stream_item->flags() & ~Qt::ItemIsEditable);
 
@@ -140,9 +140,8 @@ void PlaylistWidget::OnInsertStream(QString stream) {
 }
 
 void PlaylistWidget::OnRemoveStream(QString stream) {
-  QUrl stream_url(stream);
   QList<QTableWidgetItem *> find_items =
-      stream_table_->findItems(stream_url.fileName(), Qt::MatchExactly);
+      stream_table_->findItems(stream, Qt::MatchExactly);
   foreach (QTableWidgetItem *item, find_items) {
     stream_table_->removeRow(item->row());
   }
@@ -190,6 +189,15 @@ void PlaylistWidget::keyReleaseEvent(QKeyEvent *event) {
   }
 
   OnItemClicked(stream_table_->currentItem());
+}
+
+void PlaylistWidget::showEvent(QShowEvent *) {
+  auto *player_controller = Singleton<PlayerController>::Instance();
+
+  QString stream = player_controller->GetCurrentStream();
+  if (stream.isEmpty()) return;
+
+  OnSearchItem(stream);
 }
 
 QString PlaylistWidget::GetPlayUrl(int row) {

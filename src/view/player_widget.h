@@ -29,10 +29,12 @@ class PlayerWidget : public QWidget {
   void WindowMove();
 
  private slots:
-  void OnMediaStatusChanged(QtAV::MediaStatus status);
+  void OnStatusChanged(QString status);
 
  protected:
   virtual void showEvent(QShowEvent *event) override;
+
+  virtual void hideEvent(QHideEvent *event) override;
 
  private:
   bool is_show_details_;

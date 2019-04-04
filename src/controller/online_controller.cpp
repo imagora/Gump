@@ -45,14 +45,30 @@ void OnlineController::UpdateInfo(const QString &name, const QString &info) {
 
 bool OnlineController::QueryStream(const QString &stream, QString *url,
                                    Stream *info) {
-  auto stream_it = std::find_if(streams_.begin(), streams_.end(),
-                                [&](const Streams::value_type &stream_info){
-    return QUrl(stream_info.first).fileName() == stream;
-  });
-
+  auto stream_it = streams_.find(stream);
   if (stream_it == streams_.end()) return false;
 
-  *url = stream_it->first;
+  *url = stream_it->second.url.toString();
+
+  if (info != nullptr) {
+    *info = stream_it->second;
+  }
+  return true;
+}
+
+bool OnlineController::GetNextStream(const QString &stream, QString *url,
+                                     Stream *info) {
+  if (streams_.empty())
+    return false;
+
+  auto stream_it = streams_.find(stream);
+  if (stream_it == streams_.end() || std::next(stream_it) == streams_.end()) {
+    stream_it = streams_.begin();
+  } else {
+    ++stream_it;
+  }
+
+  *url = stream_it->second.url.toString();
 
   if (info != nullptr) {
     *info = stream_it->second;
@@ -105,8 +121,9 @@ void OnlineController::OnNetworkReply(QNetworkReply *reply) {
       stream_info.create_ts =
           static_cast<uint32_t>(stream.find("create").value().toInt());
       stream_info.name = stream.find("cname").value().toString();
+      stream_info.url = QUrl(stream.find("url").value().toString());
 
-      multi_streams[stream.find("url").value().toString()] = stream_info;
+      multi_streams[stream_info.url.fileName()] = stream_info;
     }
   }
 

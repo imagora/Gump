@@ -12,98 +12,118 @@
 namespace gump {
 
 
-static const uint32_t kMaxSize = 4;
+static const uint32_t kOldMaxBufferSize = 3;
+static const uint32_t kNewMaxBufferSize = 3;
 
 
 PlayerController::PlayerController(QObject *parent)
   : QObject(parent) {
-  max_size_ = kMaxSize;
+  renderer_ = nullptr;
 }
 
-void PlayerController::PlayStream(const QString &stream,
-                                  QtAV::VideoOutput *renderer) {
-  qInfo() << "play stream: " << stream;
-  if (!buffered_players_.empty()) {
-    if (stream == buffered_players_.front().stream)
+void PlayerController::PlayStream(const QString &stream_url) {
+  QString stream = QUrl(stream_url).fileName().section('.', 0, 0);
+  qInfo() << "play stream: " << stream_url << ", name: " << stream;
+
+  if (!new_players_.empty()) {
+    if (stream == new_players_.front().stream)
       return;
 
-    auto *playing_player = buffered_players_.front().player;
+    auto *playing_player = new_players_.front().player;
     playing_player->audio()->setMute();
     playing_player->clearVideoRenderers();
     disconnect(playing_player, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)),
                this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
   }
 
-  auto it = std::find_if(buffered_players_.begin(), buffered_players_.end(),
+  auto it = std::find_if(new_players_.begin(), new_players_.end(),
                          [&](const BufferedPlayer &player) {
     return player.stream == stream;
   });
 
   QtAV::AVPlayer *player;
-  if (it != buffered_players_.end()) {
+  if (it != new_players_.end()) {
     player = it->player;
-    buffered_players_.splice(buffered_players_.begin(), buffered_players_, it);
+    new_players_.splice(new_players_.begin(), new_players_, it);
   } else {
     BufferedPlayer new_player;
     new_player.stream = stream;
     new_player.player = new QtAV::AVPlayer();
-    new_player.player->play(stream);
+    new_player.player->play(stream_url);
 
     player = new_player.player;
 
-    buffered_players_.push_front(std::move(new_player));
+    new_players_.push_front(std::move(new_player));
   }
 
   player->audio()->setMute(false);
-  player->addVideoRenderer(renderer);
+  player->addVideoRenderer(renderer_);
   connect(player, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)),
           this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
-
+  emit StatusChangeEvent(GetCurrentStatus());
   ResizeBuffer();
 }
 
-void PlayerController::BufferStream(const QString &stream) {
-  auto it = std::find_if(buffered_players_.begin(), buffered_players_.end(),
+void PlayerController::BufferStream(const QString &stream_url) {
+  QString stream = QUrl(stream_url).fileName().section('.', 0, 0);
+  qInfo() << "buffer stream: " << stream_url << ", name: " << stream;
+
+  auto it = std::find_if(new_players_.begin(), new_players_.end(),
                          [&](const BufferedPlayer &player) {
     return player.stream == stream;
   });
 
-  if (it != buffered_players_.end()) {
+  if (it != new_players_.end()) {
     return;
   }
 
   BufferedPlayer new_player;
   new_player.stream = stream;
   new_player.player = new QtAV::AVPlayer();
-  new_player.player->play(stream);
+  new_player.player->play(stream_url);
   new_player.player->audio()->setMute();
-  buffered_players_.insert(std::next(buffered_players_.begin()), std::move(new_player));
+  new_players_.insert(std::next(new_players_.begin()),
+                           std::move(new_player));
 
   ResizeBuffer();
 }
 
-void PlayerController::ResetRenderer(QtAV::VideoOutput *renderer) {
-  if (buffered_players_.size() > 0) {
-    auto *player = buffered_players_.front().player;
+void PlayerController::SetRenderer(QtAV::VideoOutput *renderer) {
+  renderer_ = renderer;
+
+  if (new_players_.size() > 0) {
+    auto *player = new_players_.front().player;
     player->clearVideoRenderers();
-    player->addVideoRenderer(renderer);
+    player->addVideoRenderer(renderer_);
   }
+}
+
+QString PlayerController::GetCurrentStream() {
+  if (new_players_.empty()) return "";
+
+  return new_players_.front().stream;
+}
+
+QString PlayerController::GetCurrentStatus() {
+  if (new_players_.empty()) return "";
+
+  return GetPlayerStatus(new_players_.front().player, QtAV::UnknownMediaStatus);
 }
 
 void PlayerController::ReleasePlayers() {
   qInfo() << "waiting for release players";
-  for (auto &player : buffered_players_) {
+  for (auto &player : new_players_) {
     player.player->clearVideoRenderers();
     player.player->audio()->setMute();
     player.player->stop();
     player.player->deleteLater();
   }
 
-  buffered_players_.clear();
+  new_players_.clear();
 }
 
 void PlayerController::OnMediaStatusChanged(QtAV::MediaStatus status) {
-  auto *player = buffered_players_.front().player;
+  auto *player = new_players_.front().player;
   emit StatusChangeEvent(GetPlayerStatus(player, status));
 }
 
@@ -133,15 +153,14 @@ QString PlayerController::GetPlayerStatus(QtAV::AVPlayer *player,
 }
 
 void PlayerController::ResizeBuffer() {
-  if (buffered_players_.size() <= kMaxSize)
-    return;
-
-  auto *delete_player = buffered_players_.back().player;
-  if (delete_player->isPlaying()) {
-    delete_player->stop();
-    delete_player->deleteLater();
+  while (new_players_.size() > kNewMaxBufferSize) {
+    auto *delete_player = new_players_.back().player;
+    if (delete_player != nullptr && delete_player->isPlaying()) {
+      delete_player->stop();
+      delete_player->deleteLater();
+    }
+    new_players_.pop_back();
   }
-  buffered_players_.pop_back();
 }
 
 

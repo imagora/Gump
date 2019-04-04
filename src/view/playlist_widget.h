@@ -52,6 +52,8 @@ class PlaylistWidget : public QWidget {
  protected:
   virtual void keyReleaseEvent(QKeyEvent *event) override;
 
+  virtual void showEvent(QShowEvent *event) override;
+
  private:
   QString GetPlayUrl(int row);
 
@@ -63,8 +65,6 @@ class PlaylistWidget : public QWidget {
 
   QVBoxLayout *layout_;
   QHBoxLayout *tag_layout_;
-
-  Streams streams_;
 };
 
 
