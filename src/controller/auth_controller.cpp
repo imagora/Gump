@@ -114,6 +114,13 @@ void AuthController::OnIdentifierReply(QNetworkReply *reply) {
 
 void AuthController::OnOAuthReply(QNetworkReply *reply) {
   if (reply->url() == kUserInfoUrl) {
+    auto code = reply->error();
+    if (code != QNetworkReply::NoError) {
+      qInfo() << "request user info failed: " << code;
+      oauth2_->grant();
+      return;
+    }
+
     status_ = AuthStatus::kAuthOAuthSuccess;
     emit Status(status_);
     return;
