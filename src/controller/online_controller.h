@@ -54,11 +54,16 @@ class OnlineController : public QObject {
 
   void InsertJoin(const Streams &streams);
 
+  void UpdateByVid(const QString &vid);
+
+  void UpdateByAppid(const QString &appid);
+
  private:
   int refresh_timer_;
   Streams streams_;
 
   QUrl online_url_;
+  QString online_path_;
   QUrlQuery query_info_;
 
   QTimer *request_timer_;
