@@ -24,32 +24,12 @@ QMAKE_CLEAN += $(TARGET) $(QMAKE_TARGET) bin/Gump
 # PART 4: Input
 SOURCES += \
     src/main.cpp \
-    src/view/main_window.cpp \
-    src/view/about_dialog.cpp \
-    src/view/main_menubar.cpp \
-    src/view/preferences_dialog.cpp \
-    src/view/main_central_widget.cpp \
-    src/view/main_toolbar.cpp \
-    src/view/log_dock.cpp \
-    src/controller/log_dock_appender.cpp \
-    src/view/player_widget.cpp \
-    src/controller/preferences_manager.cpp \
-    src/view/application.cpp \
-    src/controller/search_event.cpp
+    src/view/*.cpp \
+    src/controller/*.cpp
 HEADERS += \
-    src/view/main_window.h \
-    src/view/about_dialog.h \
-    src/view/main_menubar.h \
-    src/view/preferences_dialog.h \
-    src/view/main_central_widget.h \
     src/commons/definations.h \
-    src/view/main_toolbar.h \
-    src/view/log_dock.h \
-    src/controller/log_dock_appender.h \
-    src/view/player_widget.h \
-    src/controller/preferences_manager.h \
-    src/view/application.h \
-    src/controller/search_event.h
+    src/view/*.h \
+    src/controller/*.h
 RESOURCES += \
     resource.qrc
 

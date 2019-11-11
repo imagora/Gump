@@ -1,7 +1,7 @@
 // Copyright (c) 2014-2019 winking324
 //
 
-#include "view/application.h"
+#include "controller/application.h"
 #include <QFileOpenEvent>
 #include <QDebug>
 

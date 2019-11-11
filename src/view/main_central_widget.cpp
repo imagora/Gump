@@ -105,7 +105,7 @@ void MainCentralWidget::keyReleaseEvent(QKeyEvent *event) {
 
 void MainCentralWidget::InsertRow(const std::string &vid,
                                   const std::string &cname,
-                                  const StreamInfo &stream) {
+                                  const Stream &stream) {
   stream_table_->insertRow(stream_table_->rowCount());
   int row = stream_table_->rowCount() - 1;
   QTableWidgetItem *vid_item = new QTableWidgetItem(vid.c_str());

@@ -6,12 +6,16 @@
 
 #include <QWidget>
 #include <QTableWidget>
+#include <QStackedLayout>
 #include <QTableWidgetItem>
 
 #include <string>
 
 #include "view/player_widget.h"
+#include "view/login_widget.h"
+#include "view/logging_widget.h"
 #include "commons/definations.h"
+#include "commons/stream_info.h"
 #include "controller/preferences_manager.h"
 
 
@@ -47,7 +51,7 @@ class MainCentralWidget :
 
  private:
   void InsertRow(const std::string &vid, const std::string &cname,
-                 const StreamInfo &stream);
+                 const Stream &stream);
 
   void RemoveRow(const std::string &vid, const std::string &cname,
                  const std::string &stream);
@@ -72,9 +76,12 @@ class MainCentralWidget :
   void RefreshStreams(ChannelStreams channel_streams);
 
  private:
+  LoginWidget *login_widget_;
+  LoggingWidget *logging_widget_;
   PlayerWidget *player_widget_;
   QTableWidget *stream_table_;
   PreferencesManager *config_mgr_;
+  QStackedLayout *stacked_layout_;
   ChannelStreams channel_streams_;
 };
 

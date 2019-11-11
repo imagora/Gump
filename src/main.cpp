@@ -8,8 +8,8 @@
 #include <QApplication>
 
 #include "view/main_window.h"
-#include "view/application.h"
 #include "commons/definations.h"
+#include "controller/application.h"
 
 
 void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
@@ -17,9 +17,9 @@ void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
   QByteArray localMsg = msg.toLocal8Bit();
   switch (type) {
     case QtDebugMsg:
-//      LOG4CPLUS_DEBUG_FMT(gump::LOGGER_NAME, "(%s:%u, %s) %s", context.file,
-//                          context.line, context.function,
-//                          localMsg.constData());
+      // LOG4CPLUS_DEBUG_FMT(gump::LOGGER_NAME, "(%s:%u, %s) %s", context.file,
+      //                     context.line, context.function,
+      //                     localMsg.constData());
     break;
     case QtInfoMsg:
       LOG4CPLUS_INFO_FMT(gump::kLoggerName,  "(%s:%u, %s) %s", context.file,
