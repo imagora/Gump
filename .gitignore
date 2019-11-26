@@ -10,3 +10,6 @@ bin/
 moc_*
 qrc_*.cpp
 gump_plugin_import.cpp
+
+# ignore project files
+.idea/
