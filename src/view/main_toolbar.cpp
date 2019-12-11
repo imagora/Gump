@@ -4,20 +4,18 @@
 #include "view/main_toolbar.h"
 
 #include <log4cplus/log4cplus.h>
+
 #include <QHBoxLayout>
-#include <QToolButton>
-#include <QLabel>
 #include <QIcon>
+#include <QLabel>
 #include <QSize>
+#include <QToolButton>
 
 #include "commons/definations.h"
 
-
 namespace gump {
 
-
-MainToolBar::MainToolBar(QWidget *parent)
-    : QToolBar(parent) {
+MainToolBar::MainToolBar(QWidget *parent) : QToolBar(parent) {
   setMovable(false);
 
   QWidget *tool_bar = new QWidget(this);
@@ -57,28 +55,18 @@ MainToolBar::MainToolBar(QWidget *parent)
   connect(details_btn, SIGNAL(released()), this, SLOT(OnDetails()));
 }
 
-MainToolBar::~MainToolBar() {
-}
+MainToolBar::~MainToolBar() {}
 
 void MainToolBar::OnSearch() {
   emit SearchItem(search_edit_->text().toStdString());
 }
 
-void MainToolBar::OnPlay() {
-  emit PlayStream();
-}
+void MainToolBar::OnPlay() { emit PlayStream(); }
 
-void MainToolBar::OnPause() {
-  emit PauseStream();
-}
+void MainToolBar::OnPause() { emit PauseStream(); }
 
-void MainToolBar::OnStop() {
-  emit StopStream();
-}
+void MainToolBar::OnStop() { emit StopStream(); }
 
-void MainToolBar::OnDetails() {
-  emit ShowDetails();
-}
-
+void MainToolBar::OnDetails() { emit ShowDetails(); }
 
 }  // namespace gump

@@ -3,16 +3,14 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <map>
 #include <QMenu>
 #include <QMenuBar>
+#include <map>
 
 #include "view/about_dialog.h"
 #include "view/preferences_dialog.h"
 
-
 namespace gump {
-
 
 class MainMenuBar : public QMenuBar {
   Q_OBJECT
@@ -35,11 +33,9 @@ class MainMenuBar : public QMenuBar {
   void OpenPreferencesDlg();
 
  private:
-  std::map<uint32_t, QMenu*> menus_;
+  std::map<uint32_t, QMenu *> menus_;
   AboutDialog *about_dlg_;
   PreferencesDialog *preferences_dlg_;
 };
 
-
-}
-
+}  // namespace gump

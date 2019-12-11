@@ -3,16 +3,13 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-
 #include <log4cplus/appender.h>
-#include "view/log_dock.h"
 
+#include "view/log_dock.h"
 
 namespace gump {
 
-
-class LogDockAppender :
-    public log4cplus::Appender {
+class LogDockAppender : public log4cplus::Appender {
  public:
   explicit LogDockAppender(LogDock *log_widget);
 
@@ -22,11 +19,10 @@ class LogDockAppender :
 
  protected:
   virtual void append(
-      const log4cplus::spi::InternalLoggingEvent& event) override;
+      const log4cplus::spi::InternalLoggingEvent &event) override;
 
  private:
   LogDock *log_widget_;
 };
 
 }  // namespace gump
-

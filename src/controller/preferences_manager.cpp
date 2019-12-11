@@ -3,43 +3,38 @@
 
 #include "controller/preferences_manager.h"
 
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <log4cplus/log4cplus.h>
+#include <netinet/in.h>
 
-#include <QTimer>
 #include <QDateTime>
-#include <QSettings>
-#include <QJsonValue>
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QNetworkRequest>
-
+#include <QSettings>
+#include <QTimer>
 #include <sstream>
-
 
 namespace gump {
 
-
-PreferencesManager::PreferencesManager(QObject *parent)
-    : QObject(parent) {
+PreferencesManager::PreferencesManager(QObject *parent) : QObject(parent) {
   config_mgr_ = new QNetworkAccessManager(this);
   online_mgr_ = new QNetworkAccessManager(this);
-  connect(config_mgr_, SIGNAL(finished(QNetworkReply*)), this,
-          SLOT(FinishConfigRequest(QNetworkReply*)));
-  connect(online_mgr_, SIGNAL(finished(QNetworkReply*)), this,
-          SLOT(FinishOnlineRequest(QNetworkReply*)));
+  connect(config_mgr_, SIGNAL(finished(QNetworkReply *)), this,
+          SLOT(FinishConfigRequest(QNetworkReply *)));
+  connect(online_mgr_, SIGNAL(finished(QNetworkReply *)), this,
+          SLOT(FinishOnlineRequest(QNetworkReply *)));
   QTimer::singleShot(1000, this, SLOT(RefreshChannelStreamsTimer()));
 
   UpdatePreferences();
 }
 
-PreferencesManager::~PreferencesManager() {
-}
+PreferencesManager::~PreferencesManager() {}
 
 void PreferencesManager::PlayStream(const std::string &command) {
-  FILE* fp = popen(command.c_str(), "r");
+  FILE *fp = popen(command.c_str(), "r");
   if (fp == nullptr) {
     LOG4CPLUS_WARN(kLoggerName, "Failed to run cmd: " << command);
   }
@@ -66,15 +61,15 @@ std::string PreferencesManager::ConvertToPlayUrl(const std::string &url) {
     switch (cap_count) {
       case 1:
         stream = stream.arg(qre.cap(1));
-      break;
+        break;
       case 2:
         stream = stream.arg(qre.cap(1), qre.cap(2));
-      break;
+        break;
       case 3:
         stream = stream.arg(qre.cap(1), qre.cap(2), qre.cap(3));
-      break;
+        break;
       default:
-      break;
+        break;
     }
   }
   return stream.toStdString();
@@ -170,7 +165,7 @@ void PreferencesManager::FinishConfigRequest(QNetworkReply *reply) {
 
       if (key != "rules") {
         new_configs.insert(
-              std::make_pair(key, iter.value().toString().toStdString()));
+            std::make_pair(key, iter.value().toString().toStdString()));
         continue;
       }
 
@@ -246,14 +241,12 @@ void PreferencesManager::FinishOnlineRequest(QNetworkReply *reply) {
       stream_info.create_ts = stream.find("create").value().toInt();
       stream_info.stream_url =
           stream.find("url").value().toString().toStdString();
-      channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())].
-          push_back(stream_info);
+      channel_streams[std::make_pair(std::to_string(vid), cname.toStdString())]
+          .push_back(stream_info);
     }
   }
 
   emit Refresh(channel_streams);
 }
 
-
 }  // namespace gump
-

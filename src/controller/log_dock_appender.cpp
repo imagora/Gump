@@ -8,20 +8,14 @@
 
 #include "commons/definations.h"
 
-
 namespace gump {
 
-
 LogDockAppender::LogDockAppender(LogDock *log_widget)
-    : log_widget_(log_widget) {
-}
+    : log_widget_(log_widget) {}
 
-LogDockAppender::~LogDockAppender() {
-}
+LogDockAppender::~LogDockAppender() {}
 
-void LogDockAppender::close() {
-  closed = true;
-}
+void LogDockAppender::close() { closed = true; }
 
 void LogDockAppender::append(
     const log4cplus::spi::InternalLoggingEvent &event) {
@@ -29,7 +23,7 @@ void LogDockAppender::append(
 
   if (!layout) {
     layout.reset(new log4cplus::PatternLayout("%d [%t] %-5p %c - %m%n"));
-    //setLayout(layout);
+    // setLayout(layout);
   }
 
   // TODO: Expose log4cplus' internal TLS to use here.
@@ -39,6 +33,5 @@ void LogDockAppender::append(
   log_widget_->InsertLog(LOG4CPLUS_TSTRING_TO_STRING(oss.str()).c_str(),
                          ll / 10000);
 }
-
 
 }  // namespace gump

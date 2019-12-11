@@ -3,17 +3,12 @@
 
 #include "controller/search_event.h"
 
-
 namespace gump {
-
 
 SearchEvent::SearchEvent(const QUrl &info) : QEvent(kSearchEventType) {
   info_ = info.adjusted(QUrl::RemoveScheme).toString().remove(0, 2);
 }
 
-QString SearchEvent::GetSearchInfo() {
-  return info_;
-}
-
+QString SearchEvent::GetSearchInfo() { return info_; }
 
 }  // namespace gump

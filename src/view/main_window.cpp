@@ -5,17 +5,14 @@
 
 #include <log4cplus/log4cplus.h>
 
-#include <QIcon>
 #include <QFileOpenEvent>
+#include <QIcon>
 
 #include "controller/search_event.h"
 
-
 namespace gump {
 
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setWindowTitle("Gump");
   setWindowIcon(QIcon(":/icon.png"));
 
@@ -41,33 +38,21 @@ MainWindow::MainWindow(QWidget *parent)
   connect(toolbar_, SIGNAL(ShowDetails()), this, SLOT(ShowDetails()));
 }
 
+MainWindow::~MainWindow() {}
 
-MainWindow::~MainWindow() {
-}
-
-void MainWindow::UpdatePreferences() {
-  central_widget_->UpdatePreferences();
-}
+void MainWindow::UpdatePreferences() { central_widget_->UpdatePreferences(); }
 
 void MainWindow::SearchItem(std::string search) {
   central_widget_->SearchItem(search);
 }
 
-void MainWindow::PlayStream() {
-  central_widget_->PlayStream();
-}
+void MainWindow::PlayStream() { central_widget_->PlayStream(); }
 
-void MainWindow::PauseStream() {
-  central_widget_->PauseStream();
-}
+void MainWindow::PauseStream() { central_widget_->PauseStream(); }
 
-void MainWindow::StopStream() {
-  central_widget_->StopStream();
-}
+void MainWindow::StopStream() { central_widget_->StopStream(); }
 
-void MainWindow::ShowDetails() {
-  central_widget_->ShowDetails();
-}
+void MainWindow::ShowDetails() { central_widget_->ShowDetails(); }
 
 bool MainWindow::event(QEvent *event) {
   if (event->type() == kSearchEventType) {
@@ -90,6 +75,4 @@ void MainWindow::moveEvent(QMoveEvent *) {
   }
 }
 
-
 }  // namespace gump
-

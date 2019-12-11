@@ -4,14 +4,12 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <QDialog>
+#include <QGridLayout>
 #include <QLineEdit>
 #include <QSettings>
 #include <QTextEdit>
-#include <QGridLayout>
-
 
 namespace gump {
-
 
 class PreferencesDialog : public QDialog {
   Q_OBJECT
@@ -38,6 +36,5 @@ class PreferencesDialog : public QDialog {
   QGridLayout *layout_;
   QSettings *settings_;
 };
-
 
 }  // namespace gump

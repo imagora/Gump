@@ -5,15 +5,11 @@
 
 #include <QDialog>
 
-
 namespace gump {
 
-
-class AboutDialog :
-    public QDialog {
+class AboutDialog : public QDialog {
  public:
   explicit AboutDialog(QWidget *parent = nullptr);
 };
-
 
 }  // namespace gump

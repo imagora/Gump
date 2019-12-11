@@ -5,9 +5,7 @@
 
 #include <QApplication>
 
-
 namespace gump {
-
 
 class Application : public QApplication {
  public:
@@ -21,6 +19,5 @@ class Application : public QApplication {
  private:
   QObject *event_receiver_;
 };
-
 
 }  // namespace gump

@@ -3,17 +3,13 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <QToolBar>
 #include <QLineEdit>
-
+#include <QToolBar>
 #include <string>
-
 
 namespace gump {
 
-
-class MainToolBar :
-    public QToolBar {
+class MainToolBar : public QToolBar {
   Q_OBJECT
 
  public:
@@ -47,6 +43,4 @@ class MainToolBar :
   QLineEdit *search_edit_;
 };
 
-
 }  // namespace gump
-

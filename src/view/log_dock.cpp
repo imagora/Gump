@@ -2,32 +2,25 @@
 //
 
 #include "view/log_dock.h"
-#include "commons/definations.h"
 
+#include "commons/definations.h"
 
 namespace gump {
 
-
-void (LogDock::*kLogFormatHandler[kLogButt])(QTextCursor*) = {
-    &LogDock::TraceLogFormat,
-    &LogDock::DebugLogFormat,
-    &LogDock::InfoLogFormat,
-    &LogDock::WarnLogFormat,
-    &LogDock::ErrorLogFormat,
-    &LogDock::FatalLogFormat,
+void (LogDock::*kLogFormatHandler[kLogButt])(QTextCursor *) = {
+    &LogDock::TraceLogFormat, &LogDock::DebugLogFormat,
+    &LogDock::InfoLogFormat,  &LogDock::WarnLogFormat,
+    &LogDock::ErrorLogFormat, &LogDock::FatalLogFormat,
 };
 
-
-LogDock::LogDock(QWidget *parent)
-  : QDockWidget(parent) {
+LogDock::LogDock(QWidget *parent) : QDockWidget(parent) {
   log_text_edit_ = new QTextEdit(this);
   log_text_edit_->document()->setMaximumBlockCount(100);
   log_text_edit_->setWordWrapMode(QTextOption::NoWrap);
   setWidget(log_text_edit_);
 }
 
-LogDock::~LogDock() {
-}
+LogDock::~LogDock() {}
 
 void LogDock::InsertLog(const QString &log_info, int log_level) {
   log_text_edit_->moveCursor(QTextCursor::End);
@@ -66,6 +59,4 @@ void LogDock::LogColorFormat(QTextCursor *text_cursor, Qt::GlobalColor color) {
   text_cursor->setCharFormat(format);
 }
 
-
 }  // namespace gump
-

@@ -3,17 +3,14 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <QString>
-#include <QTextEdit>
 #include <QDockWidget>
+#include <QString>
 #include <QTextCursor>
-
+#include <QTextEdit>
 
 namespace gump {
 
-
-class LogDock :
-    public QDockWidget {
+class LogDock : public QDockWidget {
  public:
   explicit LogDock(QWidget *parent = nullptr);
 
@@ -40,6 +37,4 @@ class LogDock :
   QTextEdit *log_text_edit_;
 };
 
-
 }  // namespace gump
-

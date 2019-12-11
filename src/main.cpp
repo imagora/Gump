@@ -2,48 +2,43 @@
 //
 
 #include <log4cplus/log4cplus.h>
-#include <QtAVWidgets/QtAVWidgets>
 
-#include <QtGlobal>
 #include <QApplication>
+#include <QtAVWidgets/QtAVWidgets>
+#include <QtGlobal>
 
-#include "view/main_window.h"
-#include "view/application.h"
 #include "commons/definations.h"
-
+#include "view/application.h"
+#include "view/main_window.h"
 
 void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
                     const QString &msg) {
   QByteArray localMsg = msg.toLocal8Bit();
   switch (type) {
     case QtDebugMsg:
-//      LOG4CPLUS_DEBUG_FMT(gump::LOGGER_NAME, "(%s:%u, %s) %s", context.file,
-//                          context.line, context.function,
-//                          localMsg.constData());
-    break;
+      //      LOG4CPLUS_DEBUG_FMT(gump::LOGGER_NAME, "(%s:%u, %s) %s",
+      //      context.file,
+      //                          context.line, context.function,
+      //                          localMsg.constData());
+      break;
     case QtInfoMsg:
-      LOG4CPLUS_INFO_FMT(gump::kLoggerName,  "(%s:%u, %s) %s", context.file,
-                         context.line, context.function,
-                         localMsg.constData());
-    break;
+      LOG4CPLUS_INFO_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
+                         context.line, context.function, localMsg.constData());
+      break;
     case QtWarningMsg:
-      LOG4CPLUS_WARN_FMT(gump::kLoggerName,  "(%s:%u, %s) %s", context.file,
-                         context.line, context.function,
-                         localMsg.constData());
-    break;
+      LOG4CPLUS_WARN_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
+                         context.line, context.function, localMsg.constData());
+      break;
     case QtCriticalMsg:
-      LOG4CPLUS_ERROR_FMT(gump::kLoggerName,  "(%s:%u, %s) %s", context.file,
-                          context.line, context.function,
-                          localMsg.constData());
-    break;
+      LOG4CPLUS_ERROR_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
+                          context.line, context.function, localMsg.constData());
+      break;
     case QtFatalMsg:
-      LOG4CPLUS_FATAL_FMT(gump::kLoggerName,  "(%s:%u, %s) %s", context.file,
-                          context.line, context.function,
-                          localMsg.constData());
+      LOG4CPLUS_FATAL_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
+                          context.line, context.function, localMsg.constData());
       abort();
   }
 }
-
 
 int main(int argc, char *argv[]) {
   QtAV::Widgets::registerRenderers();
@@ -58,4 +53,3 @@ int main(int argc, char *argv[]) {
   qInstallMessageHandler(QMessageOutput);
   return a.exec();
 }
-

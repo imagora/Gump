@@ -2,11 +2,10 @@
 //
 
 #include "view/main_menubar.h"
+
 #include "view/main_window.h"
 
-
 namespace gump {
-
 
 enum MenuType {
   kMenuSettings = 1,
@@ -14,19 +13,16 @@ enum MenuType {
   kMenuHelp = 3,
 };
 
-
-static const std::map<uint32_t, QString> kMenuName {
-  {kMenuSettings, "Settings"},
-  {kMenuWindow, "Window"},
-  {kMenuHelp, "Help"},
+static const std::map<uint32_t, QString> kMenuName{
+    {kMenuSettings, "Settings"},
+    {kMenuWindow, "Window"},
+    {kMenuHelp, "Help"},
 };
 
-
-MainMenuBar::MainMenuBar(QWidget *parent)
-    : QMenuBar(parent) {
+MainMenuBar::MainMenuBar(QWidget *parent) : QMenuBar(parent) {
   for (auto &menu_info : kMenuName) {
-    menus_.insert(std::make_pair(menu_info.first,
-                                 new QMenu(menu_info.second, this)));
+    menus_.insert(
+        std::make_pair(menu_info.first, new QMenu(menu_info.second, this)));
   }
 
   InitSettingsMenu();
@@ -38,8 +34,7 @@ MainMenuBar::MainMenuBar(QWidget *parent)
   }
 }
 
-MainMenuBar::~MainMenuBar() {
-}
+MainMenuBar::~MainMenuBar() {}
 
 void MainMenuBar::InitSettingsMenu() {
   QMenu *settingsMenu = menus_[kMenuSettings];
@@ -69,6 +64,5 @@ void MainMenuBar::OpenPreferencesDlg() {
           SLOT(UpdatePreferences()));
   preferences_dlg_->show();
 }
-
 
 }  // namespace gump

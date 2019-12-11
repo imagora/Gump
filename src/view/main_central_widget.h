@@ -3,23 +3,18 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-
-#include <QWidget>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-
+#include <QWidget>
 #include <string>
 
-#include "view/player_widget.h"
 #include "commons/definations.h"
 #include "controller/preferences_manager.h"
-
+#include "view/player_widget.h"
 
 namespace gump {
 
-
-class MainCentralWidget :
-    public QWidget {
+class MainCentralWidget : public QWidget {
   Q_OBJECT
 
  public:
@@ -78,6 +73,4 @@ class MainCentralWidget :
   ChannelStreams channel_streams_;
 };
 
-
 }  // namespace gump
-

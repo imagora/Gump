@@ -5,15 +5,13 @@
 
 #include <QMainWindow>
 
+#include "controller/log_dock_appender.h"
 #include "view/log_dock.h"
+#include "view/main_central_widget.h"
 #include "view/main_menubar.h"
 #include "view/main_toolbar.h"
-#include "view/main_central_widget.h"
-#include "controller/log_dock_appender.h"
-
 
 namespace gump {
-
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -50,6 +48,5 @@ class MainWindow : public QMainWindow {
   MainToolBar *toolbar_;
   MainCentralWidget *central_widget_;
 };
-
 
 }  // namespace gump

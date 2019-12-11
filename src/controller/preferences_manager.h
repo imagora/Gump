@@ -3,21 +3,17 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <QObject>
-#include <QNetworkReply>
 #include <QNetworkAccessManager>
-
+#include <QNetworkReply>
+#include <QObject>
 #include <map>
 #include <string>
 
 #include "commons/definations.h"
 
-
 namespace gump {
 
-
-class PreferencesManager :
-    public QObject {
+class PreferencesManager : public QObject {
   Q_OBJECT
 
  public:
@@ -25,7 +21,7 @@ class PreferencesManager :
 
   virtual ~PreferencesManager();
 
-  void PlayStream(const std::string& command);
+  void PlayStream(const std::string &command);
 
   std::string ConvertToPlayUrl(const std::string &url);
 
@@ -55,6 +51,4 @@ class PreferencesManager :
   QNetworkAccessManager *online_mgr_;
 };
 
-
 }  // namespace gump
-

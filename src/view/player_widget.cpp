@@ -3,37 +3,34 @@
 
 #include "view/player_widget.h"
 
-#include <log4cplus/log4cplus.h>
 #include <QtAVWidgets/global.h>
-#include <QTimer>
-#include <QScreen>
-#include <QPalette>
-#include <QHBoxLayout>
+#include <log4cplus/log4cplus.h>
+
 #include <QApplication>
-#include <QStackedLayout>
 #include <QDesktopWidget>
+#include <QHBoxLayout>
+#include <QPalette>
+#include <QScreen>
+#include <QStackedLayout>
+#include <QTimer>
 
 #include "commons/definations.h"
 
-
 namespace gump {
 
-
 const static std::map<uint32_t, std::string> kStatusStr = {
-  { QtAV::UnknownMediaStatus, "Unknown" },
-  { QtAV::NoMedia, "No Media" },
-  { QtAV::LoadingMedia, "Loading Media" },
-  { QtAV::LoadedMedia, "Loaded Media" },
-  { QtAV::StalledMedia, "Stalled Media" },
-  { QtAV::BufferingMedia, "Buffering Media" },
-  { QtAV::BufferedMedia, "Buffered Media" },
-  { QtAV::EndOfMedia, "End Of Media" },
-  { QtAV::InvalidMedia, "Invalid Media" },
+    {QtAV::UnknownMediaStatus, "Unknown"},
+    {QtAV::NoMedia, "No Media"},
+    {QtAV::LoadingMedia, "Loading Media"},
+    {QtAV::LoadedMedia, "Loaded Media"},
+    {QtAV::StalledMedia, "Stalled Media"},
+    {QtAV::BufferingMedia, "Buffering Media"},
+    {QtAV::BufferedMedia, "Buffered Media"},
+    {QtAV::EndOfMedia, "End Of Media"},
+    {QtAV::InvalidMedia, "Invalid Media"},
 };
 
-
-PlayerWidget::PlayerWidget(QWidget *parent)
-    : QWidget(parent) {
+PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
   is_show_details_ = false;
 
   QDesktopWidget *desktop = QApplication::desktop();
@@ -66,7 +63,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
   QPalette pe;
   pe.setColor(QPalette::WindowText, Qt::red);
   player_status_->setPalette(pe);
-  player_status_->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+  player_status_->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
   stacked_layout->addWidget(player_status_);
   stacked_layout->addWidget(video_output_->widget());
@@ -86,8 +83,7 @@ PlayerWidget::PlayerWidget(QWidget *parent)
   QTimer::singleShot(2000, this, SLOT(RefreshMediaInfoTimer()));
 }
 
-PlayerWidget::~PlayerWidget() {
-}
+PlayerWidget::~PlayerWidget() {}
 
 void PlayerWidget::PlayStream(const std::string &stream) {
   if (stream.empty() && !stream_.empty()) {
@@ -148,13 +144,9 @@ void PlayerWidget::StartStream() {
   }
 }
 
-void PlayerWidget::PauseStream() {
-  player_->pause();
-}
+void PlayerWidget::PauseStream() { player_->pause(); }
 
-void PlayerWidget::ShowDetails() {
-  is_show_details_ = !is_show_details_;
-}
+void PlayerWidget::ShowDetails() { is_show_details_ = !is_show_details_; }
 
 void PlayerWidget::WindowMove() {
   QDesktopWidget *desktop = QApplication::desktop();
@@ -167,8 +159,9 @@ void PlayerWidget::WindowMove() {
   if (screen_ratio == current_screen_ratio_) return;
   current_screen_ratio_ = screen_ratio;
 
-  LOG4CPLUS_WARN_FMT(kLoggerName, "screen changed, current number: %d, "
-                                  "current ratio: %d, change video output",
+  LOG4CPLUS_WARN_FMT(kLoggerName,
+                     "screen changed, current number: %d, "
+                     "current ratio: %d, change video output",
                      current_screen_number_, current_screen_ratio_);
 }
 
@@ -197,26 +190,23 @@ void PlayerWidget::RefreshMediaInfoTimer() {
           QString::fromLatin1("\n\tCodec: %1").arg(avstat.audio.codec);
       player_status +=
           QString::fromLatin1("\n\tBitrate: %1").arg(avstat.audio.bit_rate);
-      player_status +=
-          QString::fromLatin1("\n\tSamplerate: %1").arg(
-            avstat.audio_only.sample_rate);
-      player_status +=
-          QString::fromLatin1("\n\tAudioChannels: %1").arg(
-            avstat.audio_only.channels);
+      player_status += QString::fromLatin1("\n\tSamplerate: %1")
+                           .arg(avstat.audio_only.sample_rate);
+      player_status += QString::fromLatin1("\n\tAudioChannels: %1")
+                           .arg(avstat.audio_only.channels);
     }
 
     if (avstat.video.available) {
       player_status += "\nVideo:";
       player_status +=
           QString::fromLatin1("\n\tCodec: %1").arg(avstat.video.codec);
-      player_status +=
-          QString::fromLatin1("\n\tFPS: %1").arg(
-            avstat.video_only.currentDisplayFPS());
+      player_status += QString::fromLatin1("\n\tFPS: %1")
+                           .arg(avstat.video_only.currentDisplayFPS());
       player_status +=
           QString::fromLatin1("\n\tBitrate: %1").arg(avstat.video.bit_rate);
-      player_status +=
-          QString::fromLatin1("\n\tResolution: %1x%2").arg(
-            avstat.video_only.width).arg(avstat.video_only.height);
+      player_status += QString::fromLatin1("\n\tResolution: %1x%2")
+                           .arg(avstat.video_only.width)
+                           .arg(avstat.video_only.height);
     }
   }
 
@@ -235,6 +225,5 @@ QString PlayerWidget::PlayerStatus(uint32_t status) {
   }
   return iter->second.c_str();
 }
-
 
 }  // namespace gump

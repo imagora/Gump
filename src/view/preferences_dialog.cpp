@@ -6,12 +6,9 @@
 #include <QLabel>
 #include <QPushButton>
 
-
 namespace gump {
 
-
-PreferencesDialog::PreferencesDialog(QWidget *parent)
-    : QDialog(parent) {
+PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
   QLabel *config_url_label = new QLabel("Rule URL", this);
   config_url_input_ = new QLineEdit(this);
 
@@ -61,21 +58,20 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
   settings_->beginGroup("preferences");
   config_url_input_->setText(settings_->value("config_url").toString());
   config_username_input_->setText(
-        settings_->value("config_username").toString());
+      settings_->value("config_username").toString());
   config_password_input_->setText(
-        settings_->value("config_password").toString());
+      settings_->value("config_password").toString());
   vendor_id_input_->setText(settings_->value("vid", 0).toString());
   max_load_input_->setText(settings_->value("max", 100).toString());
   external_player_input_->setText(
-        settings_->value("external_player").toString());
+      settings_->value("external_player").toString());
   settings_->endGroup();
 
   connect(ok_btn, SIGNAL(released()), this, SLOT(OnOk()));
   connect(cancel_btn, SIGNAL(released()), this, SLOT(OnCancel()));
 }
 
-PreferencesDialog::~PreferencesDialog() {
-}
+PreferencesDialog::~PreferencesDialog() {}
 
 void PreferencesDialog::OnOk() {
   settings_->beginGroup("preferences");
@@ -91,9 +87,6 @@ void PreferencesDialog::OnOk() {
   close();
 }
 
-void PreferencesDialog::OnCancel() {
-  close();
-}
-
+void PreferencesDialog::OnCancel() { close(); }
 
 }  // namespace gump

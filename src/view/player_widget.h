@@ -7,15 +7,11 @@
 #include <QString>
 #include <QWidget>
 #include <QtAV/QtAV>
-
 #include <string>
-
 
 namespace gump {
 
-
-class PlayerWidget :
-    public QWidget {
+class PlayerWidget : public QWidget {
   Q_OBJECT
 
  public:
@@ -40,7 +36,7 @@ class PlayerWidget :
  private slots:
   void OnMediaStatusChanged(QtAV::MediaStatus status);
 
-  void OnPlayerError(const QtAV::AVError& e);
+  void OnPlayerError(const QtAV::AVError &e);
 
   void RefreshMediaInfoTimer();
 
@@ -58,6 +54,5 @@ class PlayerWidget :
   std::string stream_;
   std::string buffered_stream_;
 };
-
 
 }  // namespace gump

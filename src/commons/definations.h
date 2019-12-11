@@ -4,8 +4,8 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
 #define BUILD_DATE_TIME __DATE__ " " __TIME__
 
@@ -13,9 +13,7 @@
 #define BUILD_VERSION "Unknown"
 #endif
 
-
 namespace gump {
-
 
 enum LogLevel {
   kTrace = 0,

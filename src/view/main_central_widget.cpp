@@ -5,25 +5,21 @@
 
 #include <log4cplus/log4cplus.h>
 
-#include <QDesktopServices>
 #include <QApplication>
-#include <QVBoxLayout>
+#include <QClipboard>
+#include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QHeaderView>
-#include <QClipboard>
-#include <QSettings>
 #include <QKeyEvent>
-#include <QRegExp>
 #include <QMenu>
-
+#include <QRegExp>
+#include <QSettings>
+#include <QVBoxLayout>
 #include <map>
-
 
 namespace gump {
 
-
-MainCentralWidget::MainCentralWidget(QWidget *parent)
-    : QWidget(parent) {
+MainCentralWidget::MainCentralWidget(QWidget *parent) : QWidget(parent) {
   config_mgr_ = new PreferencesManager(this);
 
   QHBoxLayout *all_layout = new QHBoxLayout();
@@ -36,26 +32,25 @@ MainCentralWidget::MainCentralWidget(QWidget *parent)
   stream_table_->setContextMenuPolicy(Qt::CustomContextMenu);
   stream_table_->setColumnCount(3);
   stream_table_->setHorizontalHeaderLabels(
-        QStringList{"VID", "CNAME", "STREAM"});
+      QStringList{"VID", "CNAME", "STREAM"});
   stream_table_->horizontalHeader()->setSectionResizeMode(
-        0, QHeaderView::ResizeToContents);
-  stream_table_->horizontalHeader()->setSectionResizeMode(
-        2, QHeaderView::Stretch);
+      0, QHeaderView::ResizeToContents);
+  stream_table_->horizontalHeader()->setSectionResizeMode(2,
+                                                          QHeaderView::Stretch);
   table_layout->addWidget(stream_table_);
 
   player_widget_ = new PlayerWidget(this);
   all_layout->addWidget(player_widget_);
 
-  connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this,
-          SLOT(OnPlay(QTableWidgetItem*)));
+  connect(stream_table_, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this,
+          SLOT(OnPlay(QTableWidgetItem *)));
   connect(stream_table_, SIGNAL(customContextMenuRequested(QPoint)), this,
           SLOT(OnMenu(QPoint)));
   connect(config_mgr_, SIGNAL(Refresh(ChannelStreams)), this,
           SLOT(RefreshStreams(ChannelStreams)));
 }
 
-MainCentralWidget::~MainCentralWidget() {
-}
+MainCentralWidget::~MainCentralWidget() {}
 
 void MainCentralWidget::UpdatePreferences() {
   config_mgr_->UpdatePreferences();
@@ -69,29 +64,18 @@ void MainCentralWidget::SearchItem(const std::string &search) {
   stream_table_->selectRow((*find_items.begin())->row());
 }
 
-void MainCentralWidget::PlayStream() {
-  player_widget_->PlayStream("");
-}
+void MainCentralWidget::PlayStream() { player_widget_->PlayStream(""); }
 
-void MainCentralWidget::PauseStream() {
-  player_widget_->PauseStream();
-}
+void MainCentralWidget::PauseStream() { player_widget_->PauseStream(); }
 
-void MainCentralWidget::StopStream() {
-  player_widget_->StopStream();
-}
+void MainCentralWidget::StopStream() { player_widget_->StopStream(); }
 
-void MainCentralWidget::ShowDetails() {
-  player_widget_->ShowDetails();
-}
+void MainCentralWidget::ShowDetails() { player_widget_->ShowDetails(); }
 
-void MainCentralWidget::WindowMove() {
-  player_widget_->WindowMove();
-}
+void MainCentralWidget::WindowMove() { player_widget_->WindowMove(); }
 
 void MainCentralWidget::keyReleaseEvent(QKeyEvent *event) {
-  if (event->key() != Qt::Key_Up &&
-      event->key() != Qt::Key_Down) {
+  if (event->key() != Qt::Key_Up && event->key() != Qt::Key_Down) {
     return;
   }
 
@@ -160,10 +144,11 @@ void MainCentralWidget::DiffChannelStreams(
     }
 
     for (auto stream : channel.second) {
-      auto stream_iter = std::find_if(iter->second.begin(), iter->second.end(),
-                                      [&](const StreamInfo &item){
-        return item.stream_url == stream.stream_url;
-      });
+      auto stream_iter =
+          std::find_if(iter->second.begin(), iter->second.end(),
+                       [&](const StreamInfo &item) {
+                         return item.stream_url == stream.stream_url;
+                       });
       if (stream_iter == iter->second.end()) {
         RemoveRow(channel.first.first, channel.first.second, stream.stream_url);
       }
@@ -181,10 +166,11 @@ void MainCentralWidget::DiffChannelStreams(
     }
 
     for (auto stream : channel.second) {
-      auto stream_iter = std::find_if(iter->second.begin(), iter->second.end(),
-                                      [&](const StreamInfo &item){
-        return item.stream_url == stream.stream_url;
-      });
+      auto stream_iter =
+          std::find_if(iter->second.begin(), iter->second.end(),
+                       [&](const StreamInfo &item) {
+                         return item.stream_url == stream.stream_url;
+                       });
       if (stream_iter == iter->second.end()) {
         InsertRow(channel.first.first, channel.first.second, stream);
       }
@@ -316,6 +302,4 @@ void MainCentralWidget::RefreshStreams(ChannelStreams channel_streams) {
   channel_streams_.swap(channel_streams);
 }
 
-
 }  // namespace gump
-

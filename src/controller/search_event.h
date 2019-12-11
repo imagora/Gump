@@ -3,15 +3,13 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <QUrl>
 #include <QEvent>
 #include <QString>
+#include <QUrl>
 
 namespace gump {
 
-
 static const QEvent::Type kSearchEventType = static_cast<QEvent::Type>(1001);
-
 
 class SearchEvent : public QEvent {
  public:
@@ -22,6 +20,5 @@ class SearchEvent : public QEvent {
  private:
   QString info_;
 };
-
 
 }  // namespace gump
