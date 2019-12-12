@@ -44,14 +44,9 @@ def update():
     for key, regex, url in database.execute('SELECT * FROM rules'):
         rules[key] = {'re': regex, 'url': url}
 
-    tags = {}
-    for tag_name, tag_info in database.execute('SELECT * FROM tags'):
-        tags[tag_name] = tag_info
-
     online_url = flask.current_app.config['ONLINE_URL']
     tracer_url = flask.current_app.config['TRACER_URL']
     message['rules'] = rules
-    message['tags'] = tags
     message['online_url'] = online_url
     message['tracer_url'] = tracer_url
     return json.dumps(message)

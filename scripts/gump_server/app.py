@@ -8,14 +8,14 @@ import logging
 
 import db
 import auth
-import gump
+import config
 
 
 app = flask.Flask(__name__)
 app.logger.setLevel(logging.INFO)
 app.config.from_object('setting.BaseConfig')
 app.register_blueprint(auth.bp)
-app.register_blueprint(gump.bp)
+app.register_blueprint(config.bp)
 
 try:
     os.makedirs(app.instance_path)
