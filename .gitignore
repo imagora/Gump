@@ -1,5 +1,4 @@
 # ignore build files
-build*
 *.user
 .objs
 Makefile
@@ -11,5 +10,7 @@ moc_*
 qrc_*.cpp
 gump_plugin_import.cpp
 
-# ignore project files
-.idea/
+# ignore user files
+scripts/build_image.sh
+scripts/gump_server/schema.sql
+scripts/gump_server/setting.py
