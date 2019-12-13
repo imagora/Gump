@@ -29,6 +29,7 @@ macx {
 }
 
 include(gitversion.pri)
+include(3rdparty/fervor/Fervor.pri)
 
 SOURCES += \
     src/main.cpp \
