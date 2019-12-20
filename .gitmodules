@@ -4,3 +4,6 @@
 [submodule "3rdparty/fervor"]
 	path = 3rdparty/fervor
 	url = git@github.com:pypt/fervor.git
+[submodule "3rdparty/QSimpleUpdater"]
+	path = 3rdparty/QSimpleUpdater
+	url = git@github.com:alex-spataru/QSimpleUpdater.git
