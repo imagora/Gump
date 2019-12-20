@@ -1,9 +1,6 @@
 [submodule "3rdparty/QtAV"]
 	path = 3rdparty/QtAV
 	url = https://github.com/wang-bin/QtAV.git
-[submodule "3rdparty/fervor"]
-	path = 3rdparty/fervor
-	url = git@github.com:pypt/fervor.git
 [submodule "3rdparty/QSimpleUpdater"]
 	path = 3rdparty/QSimpleUpdater
 	url = git@github.com:alex-spataru/QSimpleUpdater.git
