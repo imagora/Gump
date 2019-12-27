@@ -2,25 +2,23 @@
 //
 
 #include "controller/auth_controller.h"
-#include <QUrl>
-#include <QtGlobal>
-#include <QSettings>
-#include <QUrlQuery>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QNetworkRequest>
-#include <QJsonParseError>
+
 #include <QDesktopServices>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QNetworkRequest>
 #include <QOAuthHttpServerReplyHandler>
+#include <QSettings>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QtGlobal>
 
 namespace gump {
 
-
 static const QUrl kUserInfoUrl("https://oauth.agoralab.co/api/userInfo");
 
-
-AuthController::AuthController(QObject *parent)
-  : QObject(parent) {
+AuthController::AuthController(QObject *parent) : QObject(parent) {
   status_ = AuthStatus::kAuthNotAuthenticated;
 
   InitOAuth();
@@ -30,17 +28,17 @@ AuthController::AuthController(QObject *parent)
   connect(oauth2_, &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
           &QDesktopServices::openUrl);
   connect(oauth2_, SIGNAL(finished(QNetworkReply *)), this,
-          SLOT(OnOAuthReply(QNetworkReply*)));
+          SLOT(OnOAuthReply(QNetworkReply *)));
   connect(oauth2_, SIGNAL(statusChanged(Status)), this,
           SLOT(OnOAuthResponse()));
-  connect(network_manager_, SIGNAL(finished(QNetworkReply*)), this,
-          SLOT(OnIdentifierReply(QNetworkReply*)));
+  connect(network_manager_, SIGNAL(finished(QNetworkReply *)), this,
+          SLOT(OnIdentifierReply(QNetworkReply *)));
 }
 
 void AuthController::RequestIdentifier(const QString &username) {
   QUrlQuery query_info;
   query_info.addQueryItem("username", username);
-  QUrl login_url("http://gump_identify.imagora.net:36767/auth/login");
+  QUrl login_url("http://gump2.imagora.net:36767/auth/login");
   login_url.setQuery(query_info);
 
   qInfo() << "request identifier: " << login_url;
@@ -79,13 +77,6 @@ void AuthController::OnIdentifierReply(QNetworkReply *reply) {
 
   if (doc.isObject()) {
     QJsonObject obj = doc.object();
-    auto status_iter = obj.find("status");
-    if (status_iter.value().type() != QJsonValue::String ||
-        status_iter.value().toString() != "success") {
-      qCritical() << "request identifier failed, status error";
-      emit Status(status_);
-      return;
-    }
 
     auto id_iter = obj.find("id");
     if (id_iter.value().type() != QJsonValue::String ||
@@ -133,20 +124,20 @@ void AuthController::OnOAuthResponse() {
       status_ = AuthStatus::kAuthOAuthNotAuthenticated;
       qCritical() << "request oauth failed, not authenticated";
       emit Status(status_);
-    break;
+      break;
     case QAbstractOAuth::Status::TemporaryCredentialsReceived:
       qInfo() << "request oauthing";
-    break;
+      break;
     case QAbstractOAuth::Status::Granted:
       status_ = AuthStatus::kAuthOAuthSuccess;
       qInfo() << "request oauth success";
       BufferToken();
       emit Status(status_);
-    break;
+      break;
     case QAbstractOAuth::Status::RefreshingToken:
       qInfo() << "request oauth refresh";
       oauth2_->refreshAccessToken();
-    break;
+      break;
   }
 }
 
@@ -186,6 +177,5 @@ void AuthController::BufferToken() {
   settings.setValue("refresh_token", oauth2_->refreshToken());
   settings.endGroup();
 }
-
 
 }  // namespace gump

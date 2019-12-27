@@ -3,15 +3,12 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-
-#include <QWidget>
 #include <QMouseEvent>
+#include <QWidget>
 
 #include "view/player_widget.h"
 
-
 namespace gump {
-
 
 class PlayWidget : public QWidget {
   Q_OBJECT
@@ -33,6 +30,5 @@ class PlayWidget : public QWidget {
  private:
   PlayerWidget *player_;
 };
-
 
 }  // namespace gump

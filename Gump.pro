@@ -29,14 +29,12 @@ macx {
 }
 
 include(gitversion.pri)
-include(3rdparty/fervor/Fervor.pri)
+include(3rdparty/QSimpleUpdater/QSimpleUpdater.pri)
 
 SOURCES += \
     src/main.cpp \
     src/view/about_dialog.cpp \
-    src/view/log_dock.cpp \
-    src/view/main_menubar.cpp \
-    src/controller/log_dock_appender.cpp \
+    src/view/menubar.cpp \
     src/view/player_widget.cpp \
     src/view/application.cpp \
     src/controller/search_event.cpp \
@@ -45,21 +43,13 @@ SOURCES += \
     src/view/central_widget.cpp \
     src/view/line_edit.cpp \
     src/view/logging_widget.cpp \
-    src/view/playlist_widget.cpp \
     src/view/play_widget.cpp \
     src/controller/auth_controller.cpp \
-    src/view/tag.cpp \
-    src/controller/config_controller.cpp \
-    src/controller/stream_rule_controller.cpp \
-    src/controller/online_controller.cpp \
-    src/controller/tracer_controller.cpp \
     src/controller/player_controller.cpp
 HEADERS += \
     src/view/about_dialog.h \
     src/commons/definations.h \
-    src/view/main_menubar.h \
-    src/view/log_dock.h \
-    src/controller/log_dock_appender.h \
+    src/view/menubar.h \
     src/view/player_widget.h \
     src/view/application.h \
     src/controller/search_event.h \
@@ -68,15 +58,9 @@ HEADERS += \
     src/view/central_widget.h \
     src/view/line_edit.h \
     src/view/logging_widget.h \
-    src/view/playlist_widget.h \
     src/view/play_widget.h \
     src/controller/auth_controller.h \
-    src/view/tag.h \
-    src/controller/config_controller.h \
     src/commons/singleton.h \
-    src/controller/stream_rule_controller.h \
-    src/controller/online_controller.h \
-    src/controller/tracer_controller.h \
     src/commons/stream_info.h \
     src/controller/player_controller.h
 RESOURCES += \

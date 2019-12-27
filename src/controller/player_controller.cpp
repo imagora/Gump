@@ -5,20 +5,35 @@
 
 #include <unistd.h>
 
-#include <map>
 #include <QDebug>
-
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QSettings>
+#include <map>
 
 namespace gump {
-
 
 static const uint32_t kOldMaxBufferSize = 3;
 static const uint32_t kNewMaxBufferSize = 3;
 
-
-PlayerController::PlayerController(QObject *parent)
-  : QObject(parent) {
+PlayerController::PlayerController(QObject *parent) : QObject(parent) {
   renderer_ = nullptr;
+
+  network_manager_ = new QNetworkAccessManager(this);
+  connect(network_manager_, SIGNAL(finished(QNetworkReply *)), this,
+          SLOT(OnNetworkReply(QNetworkReply *)));
+}
+
+void PlayerController::GetStream(const QUrl &url) {
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("auth");
+  QString token = settings.value("token").toString();
+  settings.endGroup();
+
+  config_request_.setUrl(url);
+  config_request_.setRawHeader("Accesstoken", token.toLocal8Bit());
+  network_manager_->get(config_request_);
 }
 
 void PlayerController::PlayStream(const QString &stream_url) {
@@ -26,8 +41,7 @@ void PlayerController::PlayStream(const QString &stream_url) {
   qInfo() << "play stream: " << stream_url << ", name: " << stream;
 
   if (!new_players_.empty()) {
-    if (stream == new_players_.front().stream)
-      return;
+    if (stream == new_players_.front().stream) return;
 
     auto *playing_player = new_players_.front().player;
     playing_player->audio()->setMute();
@@ -36,10 +50,9 @@ void PlayerController::PlayStream(const QString &stream_url) {
                this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
   }
 
-  auto it = std::find_if(new_players_.begin(), new_players_.end(),
-                         [&](const BufferedPlayer &player) {
-    return player.stream == stream;
-  });
+  auto it = std::find_if(
+      new_players_.begin(), new_players_.end(),
+      [&](const BufferedPlayer &player) { return player.stream == stream; });
 
   QtAV::AVPlayer *player;
   if (it != new_players_.end()) {
@@ -58,8 +71,8 @@ void PlayerController::PlayStream(const QString &stream_url) {
 
   player->audio()->setMute(false);
   player->addVideoRenderer(renderer_);
-  connect(player, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)),
-          this, SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
+  connect(player, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this,
+          SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
   emit StatusChangeEvent(GetCurrentStatus());
   ResizeBuffer();
 }
@@ -68,10 +81,9 @@ void PlayerController::BufferStream(const QString &stream_url) {
   QString stream = QUrl(stream_url).fileName().section('.', 0, 0);
   qInfo() << "buffer stream: " << stream_url << ", name: " << stream;
 
-  auto it = std::find_if(new_players_.begin(), new_players_.end(),
-                         [&](const BufferedPlayer &player) {
-    return player.stream == stream;
-  });
+  auto it = std::find_if(
+      new_players_.begin(), new_players_.end(),
+      [&](const BufferedPlayer &player) { return player.stream == stream; });
 
   if (it != new_players_.end()) {
     return;
@@ -82,8 +94,7 @@ void PlayerController::BufferStream(const QString &stream_url) {
   new_player.player = new QtAV::AVPlayer();
   new_player.player->play(stream_url);
   new_player.player->audio()->setMute();
-  new_players_.insert(std::next(new_players_.begin()),
-                           std::move(new_player));
+  new_players_.insert(std::next(new_players_.begin()), std::move(new_player));
 
   ResizeBuffer();
 }
@@ -127,18 +138,42 @@ void PlayerController::OnMediaStatusChanged(QtAV::MediaStatus status) {
   emit StatusChangeEvent(GetPlayerStatus(player, status));
 }
 
+void PlayerController::OnNetworkReply(QNetworkReply *reply) {
+  QByteArray data = reply->readAll();
+  QJsonParseError parse_err;
+  QJsonDocument doc = QJsonDocument::fromJson(data, &parse_err);
+  if (parse_err.error != QJsonParseError::NoError || !doc.isObject()) {
+    qCritical() << "cannot parse config response" << data;
+  } else {
+    QJsonObject obj = doc.object();
+    auto status_iter = obj.find("status");
+    if (status_iter.value().type() != QJsonValue::String ||
+        status_iter.value().toString() != "success") {
+      qCritical() << "request config failed, status error";
+      return;
+    }
+
+    auto tags_iter = obj.find("stream");
+    if (tags_iter.value().type() != QJsonValue::String) {
+      qCritical() << "request config failed, tags error";
+    } else {
+      PlayStream(tags_iter.value().toString());
+    }
+  }
+}
+
 QString PlayerController::GetPlayerStatus(QtAV::AVPlayer *player,
                                           uint32_t status) {
   const static std::map<uint32_t, QString> kPlayerStatusInfo = {
-    { QtAV::UnknownMediaStatus, "Unknown" },
-    { QtAV::NoMedia, "No Media" },
-    { QtAV::LoadingMedia, "Loading Media" },
-    { QtAV::LoadedMedia, "Loaded Media" },
-    { QtAV::StalledMedia, "Stalled Media" },
-    { QtAV::BufferingMedia, "Buffering Media" },
-    { QtAV::BufferedMedia, "Buffered Media" },
-    { QtAV::EndOfMedia, "End Of Media" },
-    { QtAV::InvalidMedia, "Invalid Media" },
+      {QtAV::UnknownMediaStatus, "Unknown"},
+      {QtAV::NoMedia, "No Media"},
+      {QtAV::LoadingMedia, "Loading Media"},
+      {QtAV::LoadedMedia, "Loaded Media"},
+      {QtAV::StalledMedia, "Stalled Media"},
+      {QtAV::BufferingMedia, "Buffering Media"},
+      {QtAV::BufferedMedia, "Buffered Media"},
+      {QtAV::EndOfMedia, "End Of Media"},
+      {QtAV::InvalidMedia, "Invalid Media"},
   };
 
   if (status == QtAV::UnknownMediaStatus) {
@@ -162,6 +197,5 @@ void PlayerController::ResizeBuffer() {
     new_players_.pop_back();
   }
 }
-
 
 }  // namespace gump

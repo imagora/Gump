@@ -7,22 +7,15 @@
 #include <QString>
 #include <QWidget>
 #include <QtAV/QtAV>
-
 #include <string>
 
-
 namespace gump {
-
 
 class PlayerWidget : public QWidget {
   Q_OBJECT
 
  public:
   explicit PlayerWidget(QWidget *parent = nullptr);
-
-  void PlayStream(const QString &stream);
-
-  void BufferStream(const QString &stream);
 
   void ShowDetails();
 
@@ -44,6 +37,5 @@ class PlayerWidget : public QWidget {
 
   QLabel *player_status_;
 };
-
 
 }  // namespace gump

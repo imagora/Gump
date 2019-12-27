@@ -1,7 +1,7 @@
 // Copyright (c) 2014-2019 winking324
 //
 
-#include <fvupdater.h>
+#include <QSimpleUpdater.h>
 #include <log4cplus/log4cplus.h>
 
 #include <QApplication>
@@ -45,19 +45,20 @@ int main(int argc, char *argv[]) {
 
   QApplication::setApplicationName("Gump");
   QApplication::setApplicationVersion(BUILD_VERSION);
-  QApplication::setOrganizationName("agora.io");
-  QApplication::setOrganizationDomain("agora.io");
   QApplication::setWindowIcon(QIcon(":/icon.png"));
-
-  // Check update
-  FvUpdater::sharedUpdater()->SetFeedURL(
-      "http://gump-update.imagora.net:36770/Appcast.xml");
-  FvUpdater::sharedUpdater()->CheckForUpdatesSilent();
-
   QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+  auto *updater = QSimpleUpdater::getInstance();
+  updater->setModuleVersion(gump::kCheckUpdateUrl, BUILD_VERSION);
+  updater->setNotifyOnFinish(gump::kCheckUpdateUrl, true);
+  updater->setNotifyOnUpdate(gump::kCheckUpdateUrl, true);
+  updater->setDownloaderEnabled(gump::kCheckUpdateUrl, true);
+  updater->setMandatoryUpdate(gump::kCheckUpdateUrl, true);
+  // updater->checkForUpdates(gump::kCheckUpdateUrl);
 
   // Start
   gump::GumpWindow w;
+  a.SetEventReceiver(&w);
   w.show();
 
   // qInstallMessageHandler(QMessageOutput);

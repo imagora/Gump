@@ -3,19 +3,21 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <list>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 #include <QObject>
 #include <QString>
 #include <QtAV/QtAV>
-
+#include <list>
 
 namespace gump {
-
 
 class PlayerController : public QObject {
   Q_OBJECT
  public:
   explicit PlayerController(QObject *parent = nullptr);
+
+  void GetStream(const QUrl &url);
 
   void PlayStream(const QString &stream);
 
@@ -32,6 +34,8 @@ class PlayerController : public QObject {
 
  public slots:
   void OnMediaStatusChanged(QtAV::MediaStatus status);
+
+  void OnNetworkReply(QNetworkReply *reply);
 
   void ReleasePlayers();
 
@@ -50,8 +54,8 @@ class PlayerController : public QObject {
   QtAV::VideoOutput *renderer_;
   std::list<BufferedPlayer> old_players_;
   std::list<BufferedPlayer> new_players_;
+  QNetworkRequest config_request_;
+  QNetworkAccessManager *network_manager_;
 };
 
-
 }  // namespace gump
-
