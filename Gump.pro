@@ -45,7 +45,8 @@ SOURCES += \
     src/view/logging_widget.cpp \
     src/view/play_widget.cpp \
     src/controller/auth_controller.cpp \
-    src/controller/player_controller.cpp
+    src/controller/player_controller.cpp \
+    src/view/system_tray.cpp
 HEADERS += \
     src/view/about_dialog.h \
     src/commons/definations.h \
@@ -62,6 +63,7 @@ HEADERS += \
     src/controller/auth_controller.h \
     src/commons/singleton.h \
     src/commons/stream_info.h \
-    src/controller/player_controller.h
+    src/controller/player_controller.h \
+    src/view/system_tray.h
 RESOURCES += \
     resource.qrc

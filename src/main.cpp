@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
   QApplication::setApplicationVersion(BUILD_VERSION);
   QApplication::setWindowIcon(QIcon(":/icon.png"));
   QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+  QApplication::setQuitOnLastWindowClosed(false);
 
   auto *updater = QSimpleUpdater::getInstance();
   updater->setModuleVersion(gump::kCheckUpdateUrl, BUILD_VERSION);

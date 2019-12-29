@@ -9,6 +9,7 @@ namespace gump {
 
 GumpWindow::GumpWindow(QWidget *parent) : QMainWindow(parent) {
   central_widget_ = new CentralWidget(this);
+  system_tray_ = new SystemTray(this);
 
   setCentralWidget(central_widget_);
   setFixedHeight(640);
@@ -19,6 +20,11 @@ bool GumpWindow::event(QEvent *event) {
   if (event->type() == kSearchEventType) {
     SearchEvent *search_event = dynamic_cast<SearchEvent *>(event);
     central_widget_->SearchAndPlay(search_event->GetSearchInfo());
+    return true;
+  }
+
+  if (event->type() == QEvent::Close) {
+    hide();
     return true;
   }
 

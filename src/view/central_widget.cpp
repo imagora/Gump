@@ -47,7 +47,6 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
           SLOT(OnAuthStatus(AuthStatus)));
 
   connect(login_widget_, SIGNAL(Login(QString)), this, SLOT(OnLogin(QString)));
-  connect(play_widget_, SIGNAL(QuitPlayEvent()), this, SLOT(OnPlayQuit()));
 }
 
 void CentralWidget::SearchAndPlay(const QString &info) {
