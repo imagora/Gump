@@ -32,9 +32,10 @@ include(gitversion.pri)
 include(3rdparty/QSimpleUpdater/QSimpleUpdater.pri)
 
 SOURCES += \
+    src/controller/update_controller.cpp \
+    src/controller/user_controller.cpp \
     src/main.cpp \
     src/view/about_dialog.cpp \
-    src/view/menubar.cpp \
     src/view/player_widget.cpp \
     src/view/application.cpp \
     src/controller/search_event.cpp \
@@ -46,11 +47,13 @@ SOURCES += \
     src/view/play_widget.cpp \
     src/controller/auth_controller.cpp \
     src/controller/player_controller.cpp \
-    src/view/system_tray.cpp
+    src/view/search_dialog.cpp \
+    src/view/tray_menu.cpp
 HEADERS += \
+    src/controller/update_controller.h \
+    src/controller/user_controller.h \
     src/view/about_dialog.h \
     src/commons/definations.h \
-    src/view/menubar.h \
     src/view/player_widget.h \
     src/view/application.h \
     src/controller/search_event.h \
@@ -62,8 +65,8 @@ HEADERS += \
     src/view/play_widget.h \
     src/controller/auth_controller.h \
     src/commons/singleton.h \
-    src/commons/stream_info.h \
     src/controller/player_controller.h \
-    src/view/system_tray.h
+    src/view/search_dialog.h \
+    src/view/tray_menu.h
 RESOURCES += \
     resource.qrc

@@ -4,13 +4,14 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <QStackedLayout>
+#include <QSystemTrayIcon>
 #include <QWidget>
 
-#include "controller/auth_controller.h"
+#include "controller/user_controller.h"
 #include "view/logging_widget.h"
 #include "view/login_widget.h"
-#include "view/menubar.h"
 #include "view/play_widget.h"
+#include "view/tray_menu.h"
 
 namespace gump {
 
@@ -21,22 +22,37 @@ class CentralWidget : public QWidget {
 
   void SearchAndPlay(const QString &info);
 
+  void Close();
+
  signals:
 
  public slots:
+  void OnShow(QSystemTrayIcon::ActivationReason);
+
+  void OnStayOnTop(bool enable);
+
+  void OnExit();
+
   void OnLogin(QString username);
 
-  void OnAuthStatus(AuthStatus status);
+  void OnLoginResponse(QString message);
+
+  void OnLogout();
+
+  void OnLogoutResponse();
+
+  void OnSearch(QString search_info);
 
  private:
-  MenuBar *menu_bar_;
+  QStackedLayout *stacked_layout_;
+  QSystemTrayIcon *tray_icon_;
+  TrayMenu *tray_menu_;
 
   LoginWidget *login_widget_;
   LoggingWidget *logging_widget_;
   PlayWidget *play_widget_;
 
-  QStackedLayout *stacked_layout_;
-  AuthController *auth_controller_;
+  UserController *user_controller_;
 };
 
 }  // namespace gump

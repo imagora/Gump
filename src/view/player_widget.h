@@ -19,8 +19,6 @@ class PlayerWidget : public QWidget {
 
   void ShowDetails();
 
-  void WindowMove();
-
  private slots:
   void OnStatusChanged(QString status);
 
@@ -31,8 +29,6 @@ class PlayerWidget : public QWidget {
 
  private:
   bool is_show_details_;
-  int current_screen_number_;
-  int current_screen_ratio_;
   QtAV::VideoOutput *video_output_;
 
   QLabel *player_status_;

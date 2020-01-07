@@ -1,10 +1,10 @@
 // Copyright (c) 2014-2019 winking324
 //
 
-#include <QSimpleUpdater.h>
 #include <log4cplus/log4cplus.h>
 
 #include <QApplication>
+#include <QFileInfo>
 #include <QtAVWidgets/QtAVWidgets>
 #include <QtGlobal>
 
@@ -12,31 +12,62 @@
 #include "view/application.h"
 #include "view/gump_window.h"
 
+static const char kLoggerName[] = "GUMP";
+
 void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
                     const QString &msg) {
   QByteArray localMsg = msg.toLocal8Bit();
+  QFileInfo context_file(context.file);
   switch (type) {
     case QtDebugMsg:
-      LOG4CPLUS_DEBUG_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
+      LOG4CPLUS_DEBUG_FMT(kLoggerName, "(%s:%u, %s) %s", context.file,
                           context.line, context.function, localMsg.constData());
       break;
     case QtInfoMsg:
-      LOG4CPLUS_INFO_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
-                         context.line, context.function, localMsg.constData());
+      LOG4CPLUS_INFO_FMT(kLoggerName, "[%s:%u] %s",
+                         context_file.fileName().toLocal8Bit().constData(),
+                         context.line, localMsg.constData());
       break;
     case QtWarningMsg:
-      LOG4CPLUS_WARN_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
-                         context.line, context.function, localMsg.constData());
+      LOG4CPLUS_WARN_FMT(kLoggerName, "[%s:%u] %s",
+                         context_file.fileName().toLocal8Bit().constData(),
+                         context.line, localMsg.constData());
       break;
     case QtCriticalMsg:
-      LOG4CPLUS_ERROR_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
-                          context.line, context.function, localMsg.constData());
+      LOG4CPLUS_ERROR_FMT(kLoggerName, "[%s:%u] %s",
+                          context_file.fileName().toLocal8Bit().constData(),
+                          context.line, localMsg.constData());
       break;
     case QtFatalMsg:
-      LOG4CPLUS_FATAL_FMT(gump::kLoggerName, "(%s:%u, %s) %s", context.file,
-                          context.line, context.function, localMsg.constData());
+      LOG4CPLUS_FATAL_FMT(kLoggerName, "[%s:%u] %s",
+                          context_file.fileName().toLocal8Bit().constData(),
+                          context.line, localMsg.constData());
       abort();
   }
+}
+
+void InitLog() {
+  QFile log_properties_file(":/log.properties");
+  if (!log_properties_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    return;
+  }
+
+  log4cplus::helpers::Properties log_properties;
+  QTextStream text_stream(&log_properties_file);
+  while (!text_stream.atEnd()) {
+    auto line = text_stream.readLine();
+    auto properties = line.split("=");
+    if (properties.size() != 2) {
+      continue;
+    }
+
+    auto key = properties[0].trimmed();
+    auto value = properties[1].trimmed();
+    log_properties.setProperty(key.toStdString(), value.toStdString());
+  }
+
+  log4cplus::PropertyConfigurator config(log_properties);
+  config.configure();
 }
 
 int main(int argc, char *argv[]) {
@@ -49,19 +80,12 @@ int main(int argc, char *argv[]) {
   QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
   QApplication::setQuitOnLastWindowClosed(false);
 
-  auto *updater = QSimpleUpdater::getInstance();
-  updater->setModuleVersion(gump::kCheckUpdateUrl, BUILD_VERSION);
-  updater->setNotifyOnFinish(gump::kCheckUpdateUrl, true);
-  updater->setNotifyOnUpdate(gump::kCheckUpdateUrl, true);
-  updater->setDownloaderEnabled(gump::kCheckUpdateUrl, true);
-  updater->setMandatoryUpdate(gump::kCheckUpdateUrl, true);
-  // updater->checkForUpdates(gump::kCheckUpdateUrl);
+  InitLog();
+  qInstallMessageHandler(QMessageOutput);
 
-  // Start
   gump::GumpWindow w;
   a.SetEventReceiver(&w);
   w.show();
 
-  // qInstallMessageHandler(QMessageOutput);
   return a.exec();
 }

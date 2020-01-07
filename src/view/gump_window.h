@@ -6,7 +6,6 @@
 #include <QMainWindow>
 
 #include "view/central_widget.h"
-#include "view/system_tray.h"
 
 namespace gump {
 
@@ -20,7 +19,6 @@ class GumpWindow : public QMainWindow {
 
  private:
   CentralWidget *central_widget_;
-  SystemTray *system_tray_;
 };
 
 }  // namespace gump

@@ -3,9 +3,7 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-#include <map>
-#include <string>
-#include <vector>
+#include <QString>
 
 #define BUILD_DATE_TIME __DATE__ " " __TIME__
 
@@ -15,18 +13,6 @@
 
 namespace gump {
 
-enum LogLevel {
-  kTrace = 0,
-  kDebug = 1,
-  kInfo = 2,
-  kWarn = 3,
-  kError = 4,
-  kFatal = 5,
-  kLogButt = 6,
-};
-
-static const char kLoggerName[] = "GUMP";
-static const char kCheckUpdateUrl[] =
-    "http://gump-update.imagora.net:36770/updates.json";
+static const QString kGumpServerBaseUrl = "https://gump.agoralab.co/gump/";
 
 }  // namespace gump

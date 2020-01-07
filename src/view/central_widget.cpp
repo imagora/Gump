@@ -3,6 +3,7 @@
 
 #include "view/central_widget.h"
 
+#include <QApplication>
 #include <QSettings>
 #include <QtGlobal>
 
@@ -18,8 +19,6 @@ enum class StackedWidgetIndex : int {
 };
 
 CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
-  menu_bar_ = new MenuBar(this);
-
   login_widget_ = new LoginWidget(this);
   logging_widget_ = new LoggingWidget(this);
   play_widget_ = new PlayWidget(this);
@@ -34,6 +33,15 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
 
   setLayout(stacked_layout_);
 
+  tray_menu_ = new TrayMenu(this);
+  tray_icon_ = new QSystemTrayIcon(QIcon(":/icon.png"), this);
+  tray_icon_->setContextMenu(tray_menu_);
+  tray_icon_->show();
+  auto menus = static_cast<int>(MenuItem::kMenuLogout) |
+               static_cast<int>(MenuItem::kMenuSearch) |
+               static_cast<int>(MenuItem::kMenuTools);
+  tray_menu_->SetMenuEnable(menus, false);
+
   QSettings settings("agora.io", "gump");
   settings.beginGroup("auth");
   QString username = settings.value("username").toString();
@@ -42,17 +50,50 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
     login_widget_->SetUsername(username);
   }
 
-  auth_controller_ = new AuthController(this);
-  connect(auth_controller_, SIGNAL(Status(AuthStatus)), this,
-          SLOT(OnAuthStatus(AuthStatus)));
+  user_controller_ = new UserController(this);
+  connect(user_controller_, &UserController::LoginEvent, this,
+          &CentralWidget::OnLoginResponse);
+  connect(user_controller_, &UserController::LogoutEvent, this,
+          &CentralWidget::OnLogoutResponse);
 
   connect(login_widget_, SIGNAL(Login(QString)), this, SLOT(OnLogin(QString)));
+
+  connect(tray_icon_, &QSystemTrayIcon::activated, this,
+          &CentralWidget::OnShow);
+
+  connect(tray_menu_, &TrayMenu::SearchEvent, this, &CentralWidget::OnSearch);
+  connect(tray_menu_, &TrayMenu::ExitEvent, this, &CentralWidget::OnExit);
+  connect(tray_menu_, &TrayMenu::LogoutEvent, this, &CentralWidget::OnLogout);
+  connect(tray_menu_, &TrayMenu::StayOnTopEvent, this,
+          &CentralWidget::OnStayOnTop);
 }
 
 void CentralWidget::SearchAndPlay(const QString &info) {
-  qInfo() << "search and play for: " << info;
+  qInfo() << "search and play for:" << info;
   auto *player_controller = Singleton<PlayerController>::Instance();
   player_controller->GetStream(info);
+}
+
+void CentralWidget::Close() {
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  player_controller->Stop();
+  tray_menu_->SetMenuEnable(static_cast<int>(MenuItem::kMenuTools), false);
+}
+
+void CentralWidget::OnShow(QSystemTrayIcon::ActivationReason) {
+  parentWidget()->show();
+}
+
+void CentralWidget::OnStayOnTop(bool enable) {
+  parentWidget()->setWindowFlag(Qt::WindowStaysOnTopHint, enable);
+  parentWidget()->show();
+  parentWidget()->raise();
+}
+
+void CentralWidget::OnExit() {
+  qInfo() << "Gump exit";
+  QApplication::setQuitOnLastWindowClosed(true);
+  parentWidget()->close();
 }
 
 void CentralWidget::OnLogin(QString username) {
@@ -62,28 +103,48 @@ void CentralWidget::OnLogin(QString username) {
   settings.endGroup();
 
   logging_widget_->SetUsername(username);
-  auth_controller_->RequestIdentifier(username);
+  user_controller_->Login(username);
 
   stacked_layout_->setCurrentIndex(
       static_cast<int>(StackedWidgetIndex::kLogging));
 }
 
-void CentralWidget::OnAuthStatus(AuthStatus status) {
-  if (status == AuthStatus::kAuthIdentifySuccess) {
-    auth_controller_->RequestOAuthToken();
-    return;
-  }
-
-  if (status == AuthStatus::kAuthOAuthSuccess) {
+void CentralWidget::OnLoginResponse(QString message) {
+  if (!message.isEmpty()) {
+    login_widget_->SetErrorMessage(QString("Login failed: (%1)").arg(message));
     stacked_layout_->setCurrentIndex(
-        static_cast<int>(StackedWidgetIndex::kPlay));
+        static_cast<int>(StackedWidgetIndex::kLogin));
     return;
   }
 
-  login_widget_->SetErrorMessage(
-      QString("Error(%1): login failed").arg(static_cast<uint32_t>(status)));
+  stacked_layout_->setCurrentIndex(static_cast<int>(StackedWidgetIndex::kPlay));
+
+  auto menus = static_cast<int>(MenuItem::kMenuLogout) |
+               static_cast<int>(MenuItem::kMenuSearch);
+  tray_menu_->SetMenuEnable(menus, true);
+}
+
+void CentralWidget::OnLogout() {
+  user_controller_->Logout();
+
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("auth");
+  settings.remove("username");
+  settings.endGroup();
+}
+
+void CentralWidget::OnLogoutResponse() {
   stacked_layout_->setCurrentIndex(
       static_cast<int>(StackedWidgetIndex::kLogin));
+  auto menus = static_cast<int>(MenuItem::kMenuLogout) |
+               static_cast<int>(MenuItem::kMenuSearch) |
+               static_cast<int>(MenuItem::kMenuTools);
+  tray_menu_->SetMenuEnable(menus, false);
+}
+
+void CentralWidget::OnSearch(QString search_info) {
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  player_controller->SearchStream(search_info);
 }
 
 }  // namespace gump

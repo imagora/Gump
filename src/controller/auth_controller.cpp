@@ -41,7 +41,7 @@ void AuthController::RequestIdentifier(const QString &username) {
   QUrl login_url("http://gump2.imagora.net:36767/auth/login");
   login_url.setQuery(query_info);
 
-  qInfo() << "request identifier: " << login_url;
+  qInfo() << "request identifier:" << login_url;
   network_manager_->get(QNetworkRequest(login_url));
 }
 
@@ -63,14 +63,24 @@ QString AuthController::GetToken() {
   return oauth2_->token();
 }
 
+void AuthController::RemoveToken() {
+  QSettings settings("agora.io", "gump");
+  settings.beginGroup("auth");
+  settings.remove("token");
+  settings.remove("refresh_token");
+  settings.endGroup();
+}
+
 void AuthController::OnIdentifierReply(QNetworkReply *reply) {
   status_ = AuthStatus::kAuthIdentifyFailed;
+
+  qInfo() << "on reply:" << reply->url();
 
   QByteArray data = reply->readAll();
   QJsonParseError parse_err;
   QJsonDocument doc = QJsonDocument::fromJson(data, &parse_err);
   if (parse_err.error != QJsonParseError::NoError) {
-    qCritical() << "cannot parse identifier response" << data;
+    qCritical() << "cannot parse identifier response:" << data;
     emit Status(status_);
     return;
   }
@@ -107,7 +117,7 @@ void AuthController::OnOAuthReply(QNetworkReply *reply) {
   if (reply->url() == kUserInfoUrl) {
     auto code = reply->error();
     if (code != QNetworkReply::NoError) {
-      qInfo() << "request user info failed: " << code;
+      qInfo() << "request user info failed:" << code;
       oauth2_->grant();
       return;
     }

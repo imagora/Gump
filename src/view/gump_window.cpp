@@ -3,17 +3,21 @@
 
 #include "view/gump_window.h"
 
+#include "commons/singleton.h"
 #include "controller/search_event.h"
+#include "controller/update_controller.h"
 
 namespace gump {
 
 GumpWindow::GumpWindow(QWidget *parent) : QMainWindow(parent) {
   central_widget_ = new CentralWidget(this);
-  system_tray_ = new SystemTray(this);
 
   setCentralWidget(central_widget_);
   setFixedHeight(640);
   setFixedWidth(360);
+
+  auto *update_controller = Singleton<UpdateController>::Instance();
+  update_controller->StartCheckForUpdatesTimer();
 }
 
 bool GumpWindow::event(QEvent *event) {

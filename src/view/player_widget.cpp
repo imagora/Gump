@@ -4,7 +4,6 @@
 #include "view/player_widget.h"
 
 #include <QtAVWidgets/global.h>
-#include <log4cplus/log4cplus.h>
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -22,16 +21,6 @@ namespace gump {
 
 PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
   is_show_details_ = false;
-
-  QDesktopWidget *desktop = QApplication::desktop();
-  current_screen_number_ = desktop->screenNumber(this);
-  if (current_screen_number_ < 0) {
-    current_screen_number_ = 0;
-    current_screen_ratio_ = 2;
-  } else {
-    current_screen_ratio_ =
-        desktop->screen(current_screen_number_)->devicePixelRatio();
-  }
 
   QHBoxLayout *main_layout = new QHBoxLayout();
   QStackedLayout *stacked_layout = new QStackedLayout();
@@ -63,23 +52,6 @@ PlayerWidget::PlayerWidget(QWidget *parent) : QWidget(parent) {
 }
 
 void PlayerWidget::ShowDetails() { is_show_details_ = !is_show_details_; }
-
-void PlayerWidget::WindowMove() {
-  QDesktopWidget *desktop = QApplication::desktop();
-  int screen_number = desktop->screenNumber(this);
-  if (screen_number == current_screen_number_) return;
-  current_screen_number_ = screen_number;
-
-  int screen_ratio =
-      desktop->screen(current_screen_number_)->devicePixelRatio();
-  if (screen_ratio == current_screen_ratio_) return;
-  current_screen_ratio_ = screen_ratio;
-
-  LOG4CPLUS_WARN_FMT(kLoggerName,
-                     "screen changed, current number: %d, "
-                     "current ratio: %d, change video output",
-                     current_screen_number_, current_screen_ratio_);
-}
 
 void PlayerWidget::OnStatusChanged(QString status) {
   player_status_->setText(status);

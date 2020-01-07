@@ -3,16 +3,14 @@
 
 #pragma once  // NOLINT(build/header_guard)
 
-
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QOAuth2AuthorizationCodeFlow>
 #include <QObject>
 #include <QString>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-#include <QOAuth2AuthorizationCodeFlow>
-
+#include <QTimer>
 
 namespace gump {
-
 
 enum class AuthStatus {
   kAuthNotAuthenticated,
@@ -26,9 +24,7 @@ enum class AuthStatus {
   kAuthOAuthNotAuthenticated,
 };
 
-
-class AuthController :
-    public QObject {
+class AuthController : public QObject {
   Q_OBJECT
  public:
   explicit AuthController(QObject *parent = nullptr);
@@ -38,6 +34,8 @@ class AuthController :
   void RequestOAuthToken();
 
   QString GetToken();
+
+  void RemoveToken();
 
  signals:
   void Status(AuthStatus status);
@@ -60,6 +58,4 @@ class AuthController :
   QNetworkAccessManager *network_manager_;
 };
 
-
 }  // namespace gump
-

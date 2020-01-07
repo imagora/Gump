@@ -10,5 +10,7 @@
         <file alias="username.png">Resource/username.png</file>
         <file alias="username2.png">Resource/username2.png</file>
         <file alias="password.png">Resource/password.png</file>
+
+        <file alias="log.properties">Resource/log.properties</file>
     </qresource>
 </RCC>
