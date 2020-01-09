@@ -96,8 +96,8 @@ void TrayMenu::InitExitMenu(QAction *action) {
 }
 
 void TrayMenu::OpenAboutDlg() {
-  about_dlg_ = new AboutDialog(parentWidget());
-  about_dlg_->show();
+  auto *about_dlg = new AboutDialog(parentWidget());
+  about_dlg->open();
 }
 
 void TrayMenu::OpenSearchDlg(SearchType type) {

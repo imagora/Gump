@@ -75,7 +75,6 @@ class TrayMenu : public QMenu {
 
  private:
   QMap<MenuItem, QAction *> menus_;
-  AboutDialog *about_dlg_;
 };
 
 }  // namespace gump
