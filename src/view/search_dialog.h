@@ -11,18 +11,14 @@
 namespace gump {
 
 enum class SearchType : int {
-  kSearchCName = 0x1,
-  kSearchUid = 0x2,
-  kSearchIp = 0x4,
-  kSearchUrl = 0x8,
-
-  kSearchAll = 0xF,
+  kSearchCName,
+  kSearchIp,
+  kSearchUrl,
 };
 
 class SearchDialog : public QDialog {
  public:
-  explicit SearchDialog(SearchType type = SearchType::kSearchAll,
-                        QWidget *parent = nullptr);
+  explicit SearchDialog(SearchType type, QWidget *parent = nullptr);
 
   QString SearchInfo();
 
@@ -31,16 +27,17 @@ class SearchDialog : public QDialog {
 
   void InitCNameWidgets(int *row);
 
-  void InitUidWidgets(int *row);
-
   void InitIpWidgets(int *row);
 
   void InitUrlWidgets(int *row);
 
+  bool CheckInput();
+
  private:
+  SearchType type_;
+
   QLineEdit *vendor_;
   QLineEdit *cname_;
-  QLineEdit *uid_;
   QLineEdit *ip_;
   QLineEdit *url_;
 

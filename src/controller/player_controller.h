@@ -36,14 +36,6 @@ class PlayerController : public QObject {
 
   void SearchStream(const QString &search_info);
 
-  void Stop();
-
-  void Prev();
-
-  void Next();
-
-  void Mute(bool mute);
-
   void SetRenderer(QtAV::VideoOutput *renderer);
 
   QString GetCurrentStatus();
@@ -58,10 +50,18 @@ class PlayerController : public QObject {
 
   void OnReleasePlayers();
 
- private:
-  void StopRequest(QNetworkReply *reply);
+  void OnStop();
 
-  void HttpRequest(const QUrl &url, QNetworkReply *reply);
+  void OnPrev();
+
+  void OnNext();
+
+  void OnMute(bool mute);
+
+ private:
+  void StopRequest(QNetworkReply **reply);
+
+  void HttpRequest(const QUrl &url, QNetworkReply **reply);
 
   void PlayStream(const QString &stream);
 

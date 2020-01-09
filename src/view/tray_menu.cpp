@@ -33,8 +33,6 @@ TrayMenu::TrayMenu(QWidget *parent) : QMenu(parent) {
   }
 }
 
-TrayMenu::~TrayMenu() {}
-
 void TrayMenu::SetMenuEnable(int menus, bool enable) {
   for (auto iter = menus_.begin(); iter != menus_.end(); ++iter) {
     if (static_cast<int>(iter.key()) & menus) {
@@ -56,12 +54,8 @@ void TrayMenu::InitLogoutMenu(QAction *action) {
 
 void TrayMenu::InitSearchMenu(QAction *action) {
   auto *menu = new QMenu(this);
-  menu->addAction("Search ...", this,
-                  [this]() { OpenSearchDlg(SearchType::kSearchAll); });
   menu->addAction("Search Channel Name", this,
                   [this]() { OpenSearchDlg(SearchType::kSearchCName); });
-  menu->addAction("Search User ID", this,
-                  [this]() { OpenSearchDlg(SearchType::kSearchUid); });
   menu->addAction("Search Server IP", this,
                   [this]() { OpenSearchDlg(SearchType::kSearchIp); });
   menu->addAction("Search Stream Url", this,
@@ -71,20 +65,25 @@ void TrayMenu::InitSearchMenu(QAction *action) {
 
 void TrayMenu::InitPlayControlMenu(QAction *action) {
   auto *menu = new QMenu(this);
-  menu->addAction("Stop", this, [this]() {});
-  menu->addAction("Next", this, [this]() {});
-  menu->addAction("Prev", this, [this]() {});
-  auto mute_action = menu->addAction("Mute", this, [this]() {});
+  menu->addAction("Stop", this, &TrayMenu::StopEvent);
+  menu->addAction("Prev", this, &TrayMenu::PrevEvent);
+  menu->addAction("Next", this, &TrayMenu::NextEvent);
+
+  auto mute_action = menu->addAction("Mute");
   mute_action->setChecked(true);
-  auto media_action = menu->addAction("Media Info", this, [this]() {});
+  connect(mute_action, &QAction::toggled, this, &TrayMenu::MuteEvent);
+
+  auto media_action = menu->addAction("Media Info");
   media_action->setChecked(true);
+  connect(media_action, &QAction::toggled, this, &TrayMenu::MediaInfoEvent);
+
   action->setMenu(menu);
 }
 
 void TrayMenu::InitToolsMenu(QAction *action) {
   auto *menu = new QMenu(this);
   menu->addAction("Argus", this, &TrayMenu::OpenArgusEvent);
-  menu->addAction("Stream Info", this, []() {});
+  menu->addAction("Stream Info", this, &TrayMenu::OpenStreamInfoEvent);
   action->setMenu(menu);
 }
 

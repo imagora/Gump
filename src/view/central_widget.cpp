@@ -66,6 +66,16 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
   connect(tray_menu_, &TrayMenu::LogoutEvent, this, &CentralWidget::OnLogout);
   connect(tray_menu_, &TrayMenu::StayOnTopEvent, this,
           &CentralWidget::OnStayOnTop);
+
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  connect(tray_menu_, &TrayMenu::StopEvent, player_controller,
+          &PlayerController::OnStop);
+  connect(tray_menu_, &TrayMenu::PrevEvent, player_controller,
+          &PlayerController::OnPrev);
+  connect(tray_menu_, &TrayMenu::NextEvent, player_controller,
+          &PlayerController::OnNext);
+  connect(tray_menu_, &TrayMenu::MuteEvent, player_controller,
+          &PlayerController::OnMute);
 }
 
 void CentralWidget::SearchAndPlay(const QString &info) {
@@ -76,12 +86,14 @@ void CentralWidget::SearchAndPlay(const QString &info) {
 
 void CentralWidget::Close() {
   auto *player_controller = Singleton<PlayerController>::Instance();
-  player_controller->Stop();
-  tray_menu_->SetMenuEnable(static_cast<int>(MenuItem::kMenuTools), false);
+  player_controller->OnMute(true);
+  // tray_menu_->SetMenuEnable(static_cast<int>(MenuItem::kMenuTools), false);
 }
 
 void CentralWidget::OnShow(QSystemTrayIcon::ActivationReason) {
   parentWidget()->show();
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  player_controller->OnMute(false);
 }
 
 void CentralWidget::OnStayOnTop(bool enable) {
@@ -125,6 +137,9 @@ void CentralWidget::OnLoginResponse(QString message) {
 }
 
 void CentralWidget::OnLogout() {
+  auto *player_controller = Singleton<PlayerController>::Instance();
+  player_controller->OnStop();
+
   user_controller_->Logout();
 
   QSettings settings("agora.io", "gump");

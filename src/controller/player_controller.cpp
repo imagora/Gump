@@ -28,90 +28,12 @@ PlayerController::PlayerController(QObject *parent) : QObject(parent) {
 
 void PlayerController::GetStream(const QUrl &url) {
   qInfo() << "get stream:" << url;
-  HttpRequest(url, network_reply_);
+  HttpRequest(url, &network_reply_);
 }
 
 void PlayerController::SearchStream(const QString &search_info) {
   QString url = kGumpServerBaseUrl + "search?" + search_info;
   GetStream(url);
-}
-
-void PlayerController::Stop() {
-  qInfo() << "stop all players";
-  StopRequest(network_reply_);
-  StopRequest(buffer_network_reply_);
-
-  current_stream_.clear();
-  auto iter = streams_.begin();
-  while (iter != streams_.end()) {
-    auto *player = iter.value().player;
-    player->clearVideoRenderers();
-    player->audio()->setMute();
-    player->stop();
-    player->deleteLater();
-
-    iter = streams_.erase(iter);
-  }
-}
-
-void PlayerController::Prev() {
-  if (current_stream_.isEmpty()) {
-    qInfo() << "current stream empty, ignore get prev stream";
-    return;
-  }
-
-  auto iter = streams_.find(current_stream_);
-  if (iter == streams_.end()) {
-    qCritical() << "not found stream:" << current_stream_ << ", prev failed";
-    return;
-  }
-
-  const auto &prev = iter.value().prev;
-  if (prev.isEmpty()) {
-    qInfo() << "stream:" << current_stream_ << "has no prev";
-    return;
-  }
-
-  PlayStreamById(prev);
-}
-
-void PlayerController::Next() {
-  if (current_stream_.isEmpty()) {
-    qInfo() << "current stream empty, ignore get next stream";
-    return;
-  }
-
-  auto iter = streams_.find(current_stream_);
-  if (iter == streams_.end()) {
-    qCritical() << "not found stream:" << current_stream_ << ", next failed";
-
-    return;
-  }
-
-  const auto &next = iter.value().next;
-  if (next.isEmpty()) {
-    qInfo() << "stream:" << current_stream_ << "has no next";
-    return;
-  }
-
-  PlayStreamById(next);
-}
-
-void PlayerController::Mute(bool mute) {
-  is_mute_ = mute;
-  if (current_stream_.isEmpty()) {
-    qInfo() << "current stream empty, ignore mute";
-    return;
-  }
-
-  auto iter = streams_.find(current_stream_);
-  if (iter == streams_.end()) {
-    qCritical() << "not found stream:" << current_stream_ << ", mute failed";
-    return;
-  }
-
-  qInfo() << "set stream:" << current_stream_ << (mute ? "mute" : "unmute");
-  iter.value().player->audio()->setMute(is_mute_);
 }
 
 void PlayerController::SetRenderer(QtAV::VideoOutput *renderer) {
@@ -153,21 +75,101 @@ QString PlayerController::GetCurrentStatus() {
 
 void PlayerController::OnReleasePlayers() {
   qInfo() << "waiting for release players";
-  Stop();
+  OnStop();
 }
 
-void PlayerController::StopRequest(QNetworkReply *reply) {
-  if (reply != nullptr && !reply->isFinished()) {
-    qInfo() << "last requst for:" << reply->url() << "not finished, abort";
-    reply->abort();
-    reply->deleteLater();
-    reply = nullptr;
+void PlayerController::StopRequest(QNetworkReply **reply) {
+  if (*reply != nullptr && !(*reply)->isFinished()) {
+    qInfo() << "last requst for:" << (*reply)->url() << "not finished, abort";
+    (*reply)->abort();
+    (*reply)->deleteLater();
+    *reply = nullptr;
   }
 }
 
-void PlayerController::HttpRequest(const QUrl &url, QNetworkReply *reply) {
+void PlayerController::OnStop() {
+  qInfo() << "stop all players";
+  StopRequest(&network_reply_);
+  StopRequest(&buffer_network_reply_);
+
+  current_stream_.clear();
+  auto iter = streams_.begin();
+  while (iter != streams_.end()) {
+    auto *player = iter.value().player;
+    player->clearVideoRenderers();
+    player->audio()->setMute();
+    player->stop();
+    disconnect(player, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), this,
+               SLOT(OnMediaStatusChanged(QtAV::MediaStatus)));
+
+    player->deleteLater();
+    iter = streams_.erase(iter);
+  }
+}
+
+void PlayerController::OnPrev() {
+  if (current_stream_.isEmpty()) {
+    qInfo() << "current stream empty, ignore get prev stream";
+    return;
+  }
+
+  auto iter = streams_.find(current_stream_);
+  if (iter == streams_.end()) {
+    qCritical() << "not found stream:" << current_stream_ << ", prev failed";
+    return;
+  }
+
+  const auto &prev = iter.value().prev;
+  if (prev.isEmpty()) {
+    qInfo() << "stream:" << current_stream_ << "has no prev";
+    return;
+  }
+
+  PlayStreamById(prev);
+}
+
+void PlayerController::OnNext() {
+  if (current_stream_.isEmpty()) {
+    qInfo() << "current stream empty, ignore get next stream";
+    return;
+  }
+
+  auto iter = streams_.find(current_stream_);
+  if (iter == streams_.end()) {
+    qCritical() << "not found stream:" << current_stream_ << ", next failed";
+
+    return;
+  }
+
+  const auto &next = iter.value().next;
+  if (next.isEmpty()) {
+    qInfo() << "stream:" << current_stream_ << "has no next";
+    return;
+  }
+
+  PlayStreamById(next);
+}
+
+void PlayerController::OnMute(bool mute) {
+  is_mute_ = mute;
+  if (current_stream_.isEmpty()) {
+    qInfo() << "current stream empty, ignore mute";
+    return;
+  }
+
+  auto iter = streams_.find(current_stream_);
+  if (iter == streams_.end()) {
+    qCritical() << "not found stream:" << current_stream_ << ", mute failed";
+    return;
+  }
+
+  qInfo() << "set stream:" << current_stream_ << (mute ? "mute" : "unmute");
+  iter.value().player->audio()->setMute(is_mute_);
+}
+
+void PlayerController::HttpRequest(const QUrl &url, QNetworkReply **reply) {
   qInfo() << "new request for:" << url;
-  StopRequest(network_reply_);
+  StopRequest(reply);
 
   QSettings settings("agora.io", "gump");
   settings.beginGroup("auth");
@@ -176,7 +178,7 @@ void PlayerController::HttpRequest(const QUrl &url, QNetworkReply *reply) {
 
   QNetworkRequest request(url);
   request.setRawHeader("Accesstoken", token.toLocal8Bit());
-  reply = network_manager_->get(request);
+  *reply = network_manager_->get(request);
 }
 
 void PlayerController::OnMediaStatusChanged(QtAV::MediaStatus status) {
@@ -279,7 +281,7 @@ void PlayerController::PlayStreamById(const QString &id) {
   if (iter == streams_.end()) {
     qWarning() << "not found stream:" << id << ", request from server";
 
-    QString search_info = "id=" + id;
+    QString search_info = "id=" + id.toLocal8Bit().toBase64();
     SearchStream(search_info);
     return;
   }
@@ -322,9 +324,9 @@ void PlayerController::BufferStreamById(const QString &id) {
     return;
   }
 
-  StopRequest(buffer_network_reply_);
-  QString url = kGumpServerBaseUrl + "search?id=" + id;
-  HttpRequest(url, buffer_network_reply_);
+  StopRequest(&buffer_network_reply_);
+  QString url = kGumpServerBaseUrl + "search?id=" + id.toLocal8Bit().toBase64();
+  HttpRequest(url, &buffer_network_reply_);
 }
 
 QString PlayerController::GetPlayerStatus(QtAV::AVPlayer *player,
@@ -355,7 +357,7 @@ QString PlayerController::GetPlayerStatus(QtAV::AVPlayer *player,
 void PlayerController::ResizeBuffer() {
   if (current_stream_.isEmpty()) {
     qInfo() << "current stream empty, clear all buffer";
-    Stop();
+    OnStop();
     return;
   }
 
@@ -363,7 +365,7 @@ void PlayerController::ResizeBuffer() {
   if (iter == streams_.end()) {
     qCritical() << "not found stream:" << current_stream_
                 << ", clear all buffer";
-    Stop();
+    OnStop();
     return;
   }
 

@@ -28,6 +28,7 @@ bool GumpWindow::event(QEvent *event) {
   }
 
   if (event->type() == QEvent::Close) {
+    central_widget_->Close();
     hide();
     return true;
   }

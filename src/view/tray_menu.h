@@ -27,8 +27,6 @@ class TrayMenu : public QMenu {
  public:
   explicit TrayMenu(QWidget *parent = nullptr);
 
-  virtual ~TrayMenu();
-
   void SetMenuEnable(int menus, bool enable);
 
  signals:
@@ -36,11 +34,23 @@ class TrayMenu : public QMenu {
 
   void OpenArgusEvent();
 
+  void OpenStreamInfoEvent();
+
   void SearchEvent(QString search_info);
 
   void LogoutEvent();
 
   void ExitEvent();
+
+  void StopEvent();
+
+  void PrevEvent();
+
+  void NextEvent();
+
+  void MuteEvent(bool mute);
+
+  void MediaInfoEvent(bool show);
 
  private:
   void InitStayOnTopMenu(QAction *action);

@@ -46,7 +46,7 @@ void UpdateController::Init() {
 void UpdateController::CheckForUpdates() {
   qInfo() << "check for updates";
   auto *updater = QSimpleUpdater::getInstance();
-  // updater->checkForUpdates(kCheckUpdateUrl);
+  updater->checkForUpdates(kCheckUpdateUrl);
 }
 
 }  // namespace gump

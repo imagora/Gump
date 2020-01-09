@@ -20,8 +20,12 @@ void QMessageOutput(QtMsgType type, const QMessageLogContext &context,
   QFileInfo context_file(context.file);
   switch (type) {
     case QtDebugMsg:
-      LOG4CPLUS_DEBUG_FMT(kLoggerName, "(%s:%u, %s) %s", context.file,
-                          context.line, context.function, localMsg.constData());
+      // LOG4CPLUS_DEBUG_FMT(kLoggerName, "(%s:%u, %s) %s", context.file,
+      //                     context.line, context.function,
+      //                     localMsg.constData());
+      LOG4CPLUS_DEBUG_FMT(kLoggerName, "[%s:%u] %s",
+                          context_file.fileName().toLocal8Bit().constData(),
+                          context.line, localMsg.constData());
       break;
     case QtInfoMsg:
       LOG4CPLUS_INFO_FMT(kLoggerName, "[%s:%u] %s",
