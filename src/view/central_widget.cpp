@@ -33,8 +33,11 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
 
   setLayout(stacked_layout_);
 
+  QIcon icon(":/icon.png");
+  icon.setIsMask(true);
+
   tray_menu_ = new TrayMenu(this);
-  tray_icon_ = new QSystemTrayIcon(QIcon(":/icon.png"), this);
+  tray_icon_ = new QSystemTrayIcon(icon, this);
   tray_icon_->setContextMenu(tray_menu_);
   tray_icon_->show();
   auto menus = static_cast<int>(MenuItem::kMenuLogout) |
