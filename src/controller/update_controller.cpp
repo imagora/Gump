@@ -33,7 +33,7 @@ void UpdateController::Init() {
 
   auto *updater = QSimpleUpdater::getInstance();
   updater->setModuleVersion(kCheckUpdateUrl, BUILD_VERSION);
-  updater->setNotifyOnFinish(kCheckUpdateUrl, true);
+  // updater->setNotifyOnFinish(kCheckUpdateUrl, true);
   updater->setNotifyOnUpdate(kCheckUpdateUrl, true);
   updater->setDownloaderEnabled(kCheckUpdateUrl, true);
   updater->setMandatoryUpdate(kCheckUpdateUrl, true);
