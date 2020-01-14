@@ -5,6 +5,7 @@ __copyright__ = "Copyright (c) 2019 winking324"
 import os
 import flask
 import logging
+import flask_sessionstore
 
 import db
 import login
@@ -23,6 +24,9 @@ except OSError:
     pass
 
 db.init_app(app)
+
+session = flask_sessionstore.Session()
+session.init_app(app)
 
 
 def create_app(test_config=None):

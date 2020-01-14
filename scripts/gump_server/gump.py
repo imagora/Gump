@@ -98,6 +98,10 @@ def on_search():
             key = base64.b64decode(flask.request.args['id']).decode()
             if key:
                 stream_info = search.search_by_key(flask.session, logger, key)
+        if 'ip' in flask.request.args:
+            ip = flask.request.args['ip']
+            if ip:
+                stream_info = search.search_by_detail(flask.session, logger, ip, '', '')
     else:
         ip = ''
         vendor = ''

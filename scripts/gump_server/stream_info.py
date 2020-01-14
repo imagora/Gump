@@ -48,16 +48,20 @@ def generate_stream_info(logger, key, members=None, index=0):
         else:
             stream_info['ip'] = member['ip']
 
-        if len(members) > 1:
-            prev_member = members[index - 1]
-            next_member = members[index + 1]
-            stream_info['prev'] = str(key_type) + ':' + str(prev_member['vid']) + ';' + \
-                prev_member['cname'] + ';' + str(prev_member['uid'])
-            stream_info['next'] = str(key_type) + ':' + str(next_member['vid']) + ';' + \
-                next_member['cname'] + ';' + str(next_member['uid'])
-        else:
+        if len(members) == 1:
             stream_info['prev'] = ''
             stream_info['next'] = ''
+            return stream_info
+
+        prev_member = members[index - 1]
+        stream_info['prev'] = str(key_type) + ':' + str(prev_member['vid']) + ';' + \
+            prev_member['cname'] + ';' + str(prev_member['uid'])
+
+        next_member = members[0]
+        if index + 1 < len(members):
+            next_member = members[index + 1]
+        stream_info['next'] = str(key_type) + ':' + str(next_member['vid']) + ';' + \
+            next_member['cname'] + ';' + str(next_member['uid'])
 
     return stream_info
 

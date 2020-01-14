@@ -11,9 +11,8 @@ def online_scan_index_members(logger, params):
     def request_online_page(request_params):
         url = flask.current_app.config['ONLINE_SCAN_INDEX_MEMBERS_URL']
         online_data = requests.get(url, request_params)
-        logger.info('[online]scan index members: {}'.format(online_data.url))
+        logger.info('[online]scan index members: {}, code: {}'.format(online_data.url, online_data.status_code))
         if online_data.status_code == 200:
-            logger.warn('[online]scan index members parse data failed, code: {}'.format(online_data.status_code))
             return online_data.json()
         return None
 
@@ -49,9 +48,8 @@ def online_list_streams_by_key(logger, params):
     try:
         url = flask.current_app.config['ONLINE_LIST_STREAMS_BY_KEY_URL']
         online_data = requests.get(url, params)
-        logger.info('[online]list stream by key: {}'.format(online_data.url))
+        logger.info('[online]list stream by key: {}, code: {}'.format(online_data.url, online_data.status_code))
         if online_data.status_code != 200:
-            logger.warn('[online]list stream by key failed, code: {}'.format(online_data.status_code))
             return members
 
         data = online_data.json()

@@ -20,6 +20,7 @@ class BaseConfig(object):
     OAUTH_PROXY = []
 
     SECRET_KEY = os.urandom(32)
+    SESSION_TYPE = 'filesystem'
     PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=1)
 
 
