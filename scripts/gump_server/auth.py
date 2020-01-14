@@ -7,9 +7,13 @@ import json
 import http.client
 
 
-def user_info(request, logger):
+def user_info(session, request, logger):
     remote = request.remote_addr
     try:
+        email = session.get('email')
+        if email is not None:
+            return email
+
         if 'Accesstoken' not in request.headers:
             logger.info('[auth] {} not found access token from request'.format(remote))
             return None
@@ -24,7 +28,9 @@ def user_info(request, logger):
             return None
 
         user = json.loads(user_info_res.read().decode())
-        return user['email']
+        session['email'] = user['email']
+        logger.info('[auth] {} login oauth'.format(session.get('email')))
+        return session.get('email')
     except Exception as e:
         logger.info('[auth] {} auth error: {}'.format(remote, repr(e)))
         return None

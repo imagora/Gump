@@ -36,6 +36,7 @@ def login():
             logger.info('[login] {} user {} login failed, name error'.format(remote, username))
             flask.abort(400)
 
+    flask.session['username'] = username
     logger.info('[login] {} user {} login success'.format(remote, username))
     message = {'id': flask.current_app.config['OAUTH_ID'], 'key': flask.current_app.config['OAUTH_KEY']}
     return json.dumps(message)

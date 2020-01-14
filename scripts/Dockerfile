@@ -15,6 +15,7 @@ RUN sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list && 
 
 RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple \
     flask \
+    requests \
     wheel
 
 ADD gump_server /data/app/gump_server

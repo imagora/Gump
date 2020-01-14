@@ -29,7 +29,7 @@ def auth_request():
 @bp.route('/ping', methods=('GET',))
 def on_ping():
     logger = flask.current_app.logger
-    user = auth.user_info(flask.request, logger)
+    user = auth.user_info(flask.session, flask.request, logger)
     if user is None:
         flask.abort(401)
 
@@ -40,18 +40,19 @@ def on_ping():
 @bp.route('/logout', methods=('GET',))
 def on_logout():
     logger = flask.current_app.logger
-    user = auth.user_info(flask.request, logger)
+    user = auth.user_info(flask.session, flask.request, logger)
     if user is None:
         flask.abort(401)
 
     logger.info('{} logout'.format(user))
+    flask.session.clear()
     return json.dumps({'status': 'success'})
 
 
 @bp.route('/stream', methods=('GET',))
 def on_stream():
     logger = flask.current_app.logger
-    user = auth.user_info(flask.request, logger)
+    user = auth.user_info(flask.session, flask.request, logger)
     if user is None:
         flask.abort(401)
 
@@ -81,27 +82,36 @@ def on_stream():
 @bp.route('/search', methods=('GET',))
 def on_search():
     logger = flask.current_app.logger
-    user = auth.user_info(flask.request, logger)
+    user = auth.user_info(flask.session, flask.request, logger)
     if user is None:
         flask.abort(401)
 
     logger.info('{} request {}'.format(user, flask.request.url))
 
+    stream_info = None
     message = {'status': 'failed'}
     if 'vendor' not in flask.request.args:
-        stream_info = None
         if 'url' in flask.request.args:
             url = base64.b64decode(flask.request.args['url']).decode()
             stream_info = search.search_by_url(logger, url)
         if 'id' in flask.request.args:
             key = base64.b64decode(flask.request.args['id']).decode()
-            stream_info = search.search_by_key(logger, key)
-        if stream_info is not None:
-            message['status'] = 'success'
-            message['stream'] = stream_info
-        return json.dumps(message)
+            if key:
+                stream_info = search.search_by_key(flask.session, logger, key)
+    else:
+        ip = ''
+        vendor = ''
+        cname = ''
+        if 'ip' in flask.request.args:
+            ip = flask.request.args['ip']
+        if 'vendor' in flask.request.args:
+            vendor = flask.request.args['vendor']
+        if 'cname' in flask.request.args:
+            cname = base64.b64decode(flask.request.args['cname']).decode()
+        stream_info = search.search_by_detail(flask.session, logger, ip, vendor, cname)
 
-    vendor = flask.request.args['vendor']
-
+    if stream_info is not None:
+        message['status'] = 'success'
+        message['stream'] = stream_info
     return json.dumps(message)
 
