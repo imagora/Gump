@@ -277,6 +277,10 @@ void PlayerController::OnNetworkReply(QNetworkReply *reply) {
 }
 
 void PlayerController::PlayStreamById(const QString &id) {
+  if (id.isEmpty()) {
+    return;
+  }
+
   auto iter = streams_.find(id);
   if (iter == streams_.end()) {
     qWarning() << "not found stream:" << id << ", request from server";
