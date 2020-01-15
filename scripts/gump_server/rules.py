@@ -45,8 +45,12 @@ def convert_to_play_stream(logger, url):
         logger.warn('convert to play stream failed for not found rule')
         return None
 
-    info = re.findall(rule['re'], url).pop()
-    stream = rule['url'] % (tuple(info) if isinstance(info, list) else info)
-    logger.info('convert url {} to play stream {}'.format(url, stream))
+    try:
+        info = re.findall(rule['re'], url).pop()
+        stream = rule['url'] % (tuple(info) if isinstance(info, list) else info)
+        logger.info('convert url {} to play stream {}'.format(url, stream))
+    except Exception as e:
+        logger.warn('convert url {} failed: {}'.format(url, repr(e)))
+        stream = None
     return stream
 

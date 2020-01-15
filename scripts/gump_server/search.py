@@ -73,9 +73,13 @@ def search_by_detail(session, logger, ip, vendor, cname):
     if len(members) == 0:
         return None
 
-    member = members[0]
-    key = str(key_type) + ':' + str(member['vid']) + ';' + \
-        member['cname'] + ';' + str(member['uid'])
+    try:
+        member = members[0]
+        key = str(key_type) + ':' + str(member['vid']) + ';' + \
+            member['cname'] + ';' + str(member['uid'])
+    except Exception as e:
+        logger.warn('[search]generate key failed: {}'.format(repr(e)))
+        return None
     return stream_info.generate_stream_info(logger, key, members)
 
 
