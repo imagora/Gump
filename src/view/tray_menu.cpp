@@ -69,11 +69,11 @@ void TrayMenu::InitPlayControlMenu(QAction *action) {
   menu->addAction("Prev", this, &TrayMenu::PrevEvent);
   menu->addAction("Next", this, &TrayMenu::NextEvent);
 
-  auto mute_action = menu->addAction("Mute");
+  auto *mute_action = menu->addAction("Mute");
   mute_action->setChecked(true);
   connect(mute_action, &QAction::toggled, this, &TrayMenu::MuteEvent);
 
-  auto media_action = menu->addAction("Media Info");
+  auto *media_action = menu->addAction("Media Info");
   media_action->setChecked(true);
   connect(media_action, &QAction::toggled, this, &TrayMenu::MediaInfoEvent);
 
