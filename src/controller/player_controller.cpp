@@ -125,6 +125,7 @@ void PlayerController::OnPrev() {
     return;
   }
 
+  qInfo() << "play prev stream:" << prev;
   PlayStreamById(prev);
 }
 
@@ -147,6 +148,7 @@ void PlayerController::OnNext() {
     return;
   }
 
+  qInfo() << "play next stream:" << next;
   PlayStreamById(next);
 }
 
@@ -201,6 +203,7 @@ void PlayerController::OnMediaStatusChanged(QtAV::MediaStatus status) {
 }
 
 void PlayerController::OnNetworkReply(QNetworkReply *reply) {
+  qInfo() << "recv network reply from:" << reply->url();
   if (reply != network_reply_ && reply != buffer_network_reply_) {
     qWarning() << "ignore network reply:" << reply->url();
     reply->deleteLater();
@@ -252,18 +255,16 @@ void PlayerController::OnNetworkReply(QNetworkReply *reply) {
   StreamInfo stream_info;
   if (parser(&id, &stream_info)) {
     auto iter = streams_.find(id);
-    if (iter != streams_.end()) {
-      qWarning() << "already exist stream:" << id << ", drop it";
-      return;
-    }
+    if (iter == streams_.end()) {
+      stream_info.player = new QtAV::AVPlayer();
+      if (!stream_info.play_url.isEmpty()) {
+        stream_info.player->play(stream_info.play_url);
+        stream_info.player->audio()->setMute();
+      }
 
-    stream_info.player = new QtAV::AVPlayer();
-    if (!stream_info.play_url.isEmpty()) {
-      stream_info.player->play(stream_info.play_url);
-      stream_info.player->audio()->setMute();
+      streams_.insert(id, stream_info);
+      qInfo() << "current total stream size:" << streams_.size();
     }
-
-    streams_.insert(id, stream_info);
   }
 
   if (reply == network_reply_) {
@@ -407,10 +408,12 @@ void PlayerController::ResizeBuffer() {
   }
 
   if (!found_prev) {
+    qInfo() << "buffer prev stream:" << prev;
     BufferStreamById(prev);
   }
 
   if (!found_next) {
+    qInfo() << "buffer next stream:" << next;
     BufferStreamById(next);
   }
 }
