@@ -18,14 +18,14 @@ class PlayWidget : public QWidget {
  signals:
   void QuitPlayEvent();
 
+  void PrevEvent();
+
+  void NextEvent();
+
  public slots:
 
  protected:
   virtual void keyReleaseEvent(QKeyEvent *event) override;
-
-  virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
-
-  virtual void showEvent(QShowEvent *event) override;
 
  private:
   PlayerWidget *player_;

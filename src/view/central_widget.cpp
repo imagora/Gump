@@ -79,6 +79,11 @@ CentralWidget::CentralWidget(QWidget *parent) : QWidget(parent) {
           &PlayerController::OnNext);
   connect(tray_menu_, &TrayMenu::MuteEvent, player_controller,
           &PlayerController::OnMute);
+
+  connect(play_widget_, &PlayWidget::PrevEvent, player_controller,
+          &PlayerController::OnPrev);
+  connect(play_widget_, &PlayWidget::NextEvent, player_controller,
+          &PlayerController::OnNext);
 }
 
 void CentralWidget::SearchAndPlay(const QString &info) {

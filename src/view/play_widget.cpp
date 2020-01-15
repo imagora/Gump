@@ -20,10 +20,14 @@ void PlayWidget::keyReleaseEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Escape) {
     emit QuitPlayEvent();
   }
+
+  if (event->key() == Qt::Key_Up) {
+    emit PrevEvent();
+  }
+
+  if (event->key() == Qt::Key_Down) {
+    emit NextEvent();
+  }
 }
-
-void PlayWidget::mouseDoubleClickEvent(QMouseEvent *) { emit QuitPlayEvent(); }
-
-void PlayWidget::showEvent(QShowEvent *) {}
 
 }  // namespace gump
